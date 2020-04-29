@@ -68,4 +68,3 @@ def get_text_files():
 if __name__ == '__main__':
     get_text_files()
 
-    # Test
