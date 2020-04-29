@@ -1,21 +1,9 @@
-from bs4 import BeautifulSoup
-from nltk.tokenize import RegexpTokenizer
-from nltk.corpus import stopwords
-import nltk
-import re
-import math
-import spacy
-from langdetect import detect
-import os
 import urllib
-from urllib import request, parse
-from statistics import mean
+from urllib import request
 import json
-import unicodedata
-import xml.etree.cElementTree as ET
 import time
 
-entities = {}
+entities = ['London']
 
 
 found_gnd_items = 0
@@ -25,7 +13,7 @@ ids_processed = 0
 for entity in entities:
     success = False
     #hier mal überprüfen, was da überhaupt in den Daten steht und was dann da rauskommt.
-    search_url = "https://lobid.org/gnd/search?q="+entity.split('//')[-1].replace('/', '%2F')
+    search_url = "https://lobid.org/gnd/search?q=" + entity
     trials = 0
     found=False
     while success!=True:
@@ -42,6 +30,7 @@ for entity in entities:
                 id = json_response['member'][0]['id']
                 found_gnd_items +=1
                 found=True
+                print(json_response)
             time.sleep(1)
             success=True
         except Exception as e:
