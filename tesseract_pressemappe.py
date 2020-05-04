@@ -6,9 +6,10 @@ import urllib.request
 from bs4 import BeautifulSoup
 import os
 
+# Tesseract liegt in: C:\Program Files\Tesseract-OCR
 
 def get_text_files():
-    if 'pressemappe_text_files' not in os.listdir('/home/hnebel/IdeaProjects/Pressemappe'):
+    if 'pressemappe_text_files' not in os.listdir('C://Users/Helena_Nebel/PycharmProjects/Pressemappe'):
         os.mkdir('pressemappe_text_files')
     url = 'https://zbw.eu/beta/pm20mets/pe/'
     req = urllib.request.Request(url)
@@ -42,11 +43,11 @@ def get_text_files():
                 jpg_name = url.replace('http://webopac.hwwa.de/DigiPerson/P/', '')
                 jpg_name = jpg_name.replace('/', '_')
                 txt_name = jpg_name.replace('JPG', 'txt')
-                print('file is open')
                 try:
-                    text = str(((pytesseract.image_to_string(Image.open(webfile),lang="deu"))))
-                    print(text)
-                    print('text is read')
+                    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+                    text = str(((pytesseract.image_to_string(Image.open(webfile)))))
+                    print(text.replace('\n', ' '))
+                    print(len(text))
                     language=language_codes.resolve(detect(text))
                     print(language)
                     if language!='ger':
@@ -58,8 +59,18 @@ def get_text_files():
                             lang_code='nld'
                         if language=='spa':
                             lang_code='spa'
-                    #text = str(((pytesseract.image_to_string(Image.open(webfile),lang=lang_code))))
-                    with open(txt_name, 'w') as text_file:
+                    elif language == 'ger':
+                        lang_code = 'deu'
+                        # print('lala')
+                    webfile = urllib.request.urlopen(url)
+                    text = str(((pytesseract.image_to_string(Image.open(webfile), lang=lang_code))))
+                    print(text.replace('\n', ''))
+                    print(len(text))
+                    if lang_code == 'deu':
+                        webfile = urllib.request.urlopen(url)
+                        text = str(((pytesseract.image_to_string(Image.open(webfile), lang='deu_frak'))))
+                        print(text.replace('\n', ''))
+                    with open('pressemappe_text_files/' + txt_name, 'w') as text_file:
                         text_file.write(text)
                 except Exception as e:
                     print(e)
