@@ -1,9 +1,101 @@
 import json
 import urllib
 from urllib import request, parse
+from fuzzywuzzy import fuzz
 
 with open("./entities.json", mode="r", encoding="utf-8") as file:
     image_list = json.load(file)[0]
+
+# führt eindeutige Dubletten zusammen
+for image in image_list:
+
+    per_list = []
+    loc_list = []
+
+    for entity in image_list[image]:
+        if entity["type"] == "PER":
+            per_list.append(entity["name"])
+        else:
+            loc_list.append(entity["name"])
+
+    per_possible_duplicate_list = []
+    loc_possible_duplicate_list = []
+
+    for name in per_list:
+        temp_per_list = per_list[:per_list.index(name)] + per_list[per_list.index(name) + 1:]
+
+        for other_name in temp_per_list:
+
+            # Simpson == Homer Simpson, andere Minimalwerte möglich
+            if fuzz.token_set_ratio(name, other_name) == 100:
+                if sorted([name, other_name]) not in per_possible_duplicate_list:
+                    per_possible_duplicate_list.append(sorted([name, other_name]))
+
+    for name in loc_list:
+        temp_loc_list = loc_list[:loc_list.index(name)] + loc_list[loc_list.index(name) + 1:]
+
+        for other_name in temp_loc_list:
+
+            if fuzz.token_set_ratio(name, other_name) == 100:
+                if sorted([name, other_name]) not in loc_possible_duplicate_list:
+                    loc_possible_duplicate_list.append(sorted([name, other_name]))
+
+    per_duplicate_list = []
+    loc_duplicate_list = []
+
+    for possible_duplicate in per_possible_duplicate_list:
+        per_duplicate_list += possible_duplicate
+
+    for possible_duplicate in loc_possible_duplicate_list:
+        loc_duplicate_list += possible_duplicate
+
+    for name in per_duplicate_list:
+        if per_duplicate_list.count(name) > 1:
+            for possible_duplicate in per_possible_duplicate_list:
+                if name in possible_duplicate:
+                    per_possible_duplicate_list.remove(possible_duplicate)
+
+    for name in loc_duplicate_list:
+        if loc_duplicate_list.count(name) > 1:
+            for possible_duplicate in loc_possible_duplicate_list:
+                if name in possible_duplicate:
+                    loc_possible_duplicate_list.remove(possible_duplicate)
+
+    for definitive_duplicate in per_possible_duplicate_list:
+        for entity in image_list[image]:
+            if entity["name"] in definitive_duplicate and entity["type"] == "PER":
+                if len(definitive_duplicate) < 3:
+                    definitive_duplicate.append(entity["frequency"])
+                else:
+                    definitive_duplicate[2] += entity["frequency"]
+
+    for definitive_duplicate in loc_possible_duplicate_list:
+        for entity in image_list[image]:
+            if entity["name"] in definitive_duplicate and entity["type"] == "LOC":
+                if len(definitive_duplicate) < 3:
+                    definitive_duplicate.append(entity["frequency"])
+                else:
+                    definitive_duplicate[2] += entity["frequency"]
+
+    per_dict_list = [entity for entity in image_list[image] if (entity["type"] == "PER")]
+    loc_dict_list = [entity for entity in image_list[image] if (entity["type"] == "LOC")]
+
+    for definitive_duplicate in per_possible_duplicate_list:
+        per_dict_list = [entity for entity in per_dict_list if (entity["name"] not in definitive_duplicate[:2])]
+        if len(definitive_duplicate[0]) > len(definitive_duplicate[1]):
+            per_dict_list.append({"name": definitive_duplicate[0], "type": "PER", "frequency": definitive_duplicate[2]})
+        else:
+            per_dict_list.append({"name": definitive_duplicate[1], "type": "PER", "frequency": definitive_duplicate[2]})
+
+    for definitive_duplicate in loc_possible_duplicate_list:
+        loc_dict_list = [entity for entity in loc_dict_list if (entity["name"] not in definitive_duplicate[:2])]
+        if len(definitive_duplicate[0]) > len(definitive_duplicate[1]):
+            loc_dict_list.append({"name": definitive_duplicate[0], "type": "LOC", "frequency": definitive_duplicate[2]})
+        else:
+            loc_dict_list.append({"name": definitive_duplicate[1], "type": "LOC", "frequency": definitive_duplicate[2]})
+
+    image_list[image] = per_dict_list + loc_dict_list
+
 
 for image in image_list:
     for entity in image_list[image]:
