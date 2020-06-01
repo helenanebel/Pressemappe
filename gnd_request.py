@@ -97,6 +97,40 @@ for image in image_list:
     image_list[image] = per_dict_list + loc_dict_list
 
 
+# Vornamen Nachname -> Nachname, Vornamen
+for image in image_list:
+    for entity in image_list[image]:
+        if entity["type"] == "PER":
+            entity_name_split = entity["name"].split()
+            if len(entity_name_split) > 1:
+                entity_new_name = entity_name_split[-1] + ","
+
+                for particial_name in entity_name_split[:-1]:
+                    entity_new_name += " " + particial_name
+
+                entity["name"] = entity_new_name
+
+
+# ID und Label
+rel_id_list = [
+    "placeOfBirth",
+    "placeOfDeath",
+    "placeOfExile",
+    "placeOfActivity",
+    "familialRelationship",
+    "professionalRelationship",
+    "aquaintanceshipOrFriendship",
+    "relatedPerson",
+    "relatedPlaceOrGeographicName"
+]
+
+# Freitext
+rel_text_list = [
+    "definition",
+    "biographicalOrHistoricalInformation"
+]
+
+
 for image in image_list:
     for entity in image_list[image]:
         search_url = "https://lobid.org/gnd/search?q="
@@ -108,12 +142,12 @@ for image in image_list:
         search_url += "+OR+"
 
         search_url += urllib.parse.quote_plus("variantName:")
-        search_url += urllib.parse.quote_plus(entity["name"])
+        search_url += "\"" + urllib.parse.quote_plus(entity["name"]) + "\""
 
         # Typ
         search_url += "&filter=" + urllib.parse.quote_plus("type:")
         if entity["type"] == "PER":
-            search_url += "Person"
+            search_url += "DifferentiatedPerson"
         else:
             search_url += "PlaceOrGeographicName"
 
@@ -129,12 +163,43 @@ for image in image_list:
         json_response = json.loads(json_response)
 
         if json_response["totalItems"] < 1:
-            entity["possibleGndId"] = []
-            break
-        elif json_response["totalItems"] < 1001:
+            entity["possibleGndId"] = [] # mit anderen Einstellungen wiederholen
+        else: # hier fehlt noch Schleife bei mehr als 1000 Treffern
             entity["possibleGndId"] = []
             for gnd_entity in json_response["member"]:
-                entity["possibleGndId"].append(gnd_entity["gndIdentifier"])
 
-with open("./entities.json", mode="w+", encoding="utf-8") as file:
-    json.dump([image_list], file, indent=4)
+                # jeder Treffer als Liste anlegen
+                possible_gnd_id_list = []
+
+                # 1. Element: Identifier als String
+                possible_gnd_id_list.append(gnd_entity["gndIdentifier"])
+
+                gnd_id_relation_list = []
+
+                # 2. Element: Beziehungen zu anderen Identifiern als Strings in Liste
+                for rel_field in rel_id_list:
+                    try:
+                        for relation in gnd_entity[rel_field]:
+                            gnd_id_relation_list.append(relation["id"][22:])
+                    except KeyError:
+                        continue
+
+                possible_gnd_id_list.append(gnd_id_relation_list)
+
+                gnd_text_relation_list = []
+
+                # 3. Element: Freitext-Beschreibungen als Strings in Liste
+                for rel_field in rel_text_list:
+                    try:
+                        for information in gnd_entity[rel_field]:
+                            gnd_text_relation_list.append(information)
+                    except KeyError:
+                        continue
+
+                possible_gnd_id_list.append(gnd_text_relation_list)
+
+                entity["possibleGndId"].append(possible_gnd_id_list)
+
+
+with open("./gnd_ids_relation.json", mode="w+", encoding="utf-8") as file:
+    json.dump([image_list], file)
