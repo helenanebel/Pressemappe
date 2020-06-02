@@ -121,7 +121,13 @@ rel_id_list = [
     "professionalRelationship",
     "aquaintanceshipOrFriendship",
     "relatedPerson",
-    "relatedPlaceOrGeographicName"
+    "relatedPlaceOrGeographicName",
+    "place",
+    "characteristicPlace",
+    "hierarchicalSuperiorOfPlaceOrGeographicName",
+    "buildingOwner",
+    "architect",
+    "startingOrFinalPointOfADistance"
 ]
 
 # Freitext
