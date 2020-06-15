@@ -58,6 +58,6 @@ for picture in os.listdir('jpgs'):
     avg_color_per_row = np.average(roi, axis=0)
     avg_color = np.average(roi, axis=1)
     print(avg_color)
-    saveimg(roi, picture, 'jpgs_edited/')
+    saveimg(roi, picture, 'jpgs_cut/')
 
 # max - und min- und average-values ermitteln und diese verwenden, um das weitere Vorgehen zu bestimmen.
