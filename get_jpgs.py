@@ -30,9 +30,10 @@ def get_jpgs():
                     per_xml_page = response.read()
                 per_xml_page = per_xml_page.decode('utf-8')
                 per_xml_soup = BeautifulSoup(per_xml_page, 'xml')
-                jpg_urls = [img_tag['xlink:href'] for img_tag in per_xml_soup.find('mets:fileGrp', USE="DEFAULT").find_all('mets:FLocat', LOCTYPE="URL")]
+                jpg_urls = [img_tag['xlink:href'].replace('B.JPG', 'A.JPG') for img_tag in per_xml_soup.find('mets:fileGrp', USE="DEFAULT").find_all('mets:FLocat', LOCTYPE="URL")]
                 jpg_nr=0
                 for url in jpg_urls:
+                    print(url)
                     jpg_nr+=1
                     jpg_name = url.replace('http://webopac.hwwa.de/DigiPerson/P/', '')
                     jpg_name = jpg_name.replace('/', '_')
