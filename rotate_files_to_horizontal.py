@@ -52,26 +52,7 @@ for picture in ['pressemappe_results/test_5.JPG']:
                     region_nr += 1
             if sum(regions_with_characters) <= len(region_list) * 0.2:
                 columns_to_delete.append(column)
-        starting = []
-        for col in range(1, len(columns_to_delete) - 1):
-            if columns_to_delete[col] -1 != columns_to_delete[col -1]:
-                break
-            starting.append(columns_to_delete[col])
-        starting = max(starting)
-        ending = []
-        for col in range(len(columns_to_delete) - 1, 1, -1):
-            if columns_to_delete[col] - 1 != columns_to_delete[col -1]:
-                break
-            ending.append(columns_to_delete[col])
-        ending = min(ending)
-        if dimension == gray.shape[0]:
-            print(starting, ending)
-            gray[0:starting, 0:gray.shape[1]] = 0
-            gray[ending:gray.shape[0], 0:gray.shape[1]] = 0
-        else:
-            print(starting, ending)
-            gray[0:gray.shape[0], 0:starting] = 0
-            gray[0:gray.shape[0], ending:gray.shape[1]] = 0
+
     # alle Spalten in dieser Liste mit 255 auffüllen!
     # shape[0] ist width, shape[1] ist heigth
 
@@ -80,7 +61,7 @@ for picture in ['pressemappe_results/test_5.JPG']:
     # wenn man die Regionen auswertet. (besser sind wenige Regionen
     # mit einem hohen Gesamtwert als viele Regionen mit einem niedrigen Gesamtwert!
     # noch versuchen, die Kante zu finden!!!
-
+    # vorher noch blurren!
     saveimg(gray, 'lala.JPG', 'jpgs_sharpened/') # geht nur mit .JPG am Ende.
 
     break
