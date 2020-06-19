@@ -81,6 +81,14 @@ def get_data(member_list):
             except KeyError:
                 continue
 
+        try:
+            for code in member["geographicAreaCode"]:
+                code = geo_codes[code["id"][59:]]
+                if code not in gnd["relations"] and code != gnd["identifier"]:
+                    gnd["relations"].append(code)
+        except KeyError:
+            continue
+
         for field in relations["descriptions"]:
             try:
                 for text in member[field]:
