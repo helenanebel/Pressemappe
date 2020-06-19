@@ -54,7 +54,7 @@ for picture in os.listdir('jpgs_cut'):
     # yx = cv.bitwise_not(closing)
     last = cv.Laplacian(imagem, cv.CV_64F) # funktioniert sehr gut!
     ops = 'Laplacian'
-    #
+
     # th2 = cv.adaptiveThreshold(blur,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,3,2)
     # ret3, th3 = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
     # imagem = cv.bitwise_not(th2) # Invertierung
@@ -70,10 +70,22 @@ for picture in os.listdir('jpgs_cut'):
 
     picture = picture.split('_PIC')[0].split('_', 1)[1] + '_' + ops + '.JPG'
     saveimg(last, picture, 'jpgs_sharpened/') # geht nur mit .JPG am Ende.
-    # img = cv.imread('jpgs_sharpened/' + picture)
 
+    img = cv.imread('jpgs_sharpened/' + picture)
+    imagem = cv.bitwise_not(img)
+    img = cv.cvtColor(imagem, cv.COLOR_BGR2GRAY)
+    cons, hierarchy = cv.findContours(img, cv.RETR_LIST, cv.CHAIN_APPROX_NONE)
+    contours_sorted = sorted(cons, key=cv.contourArea)
+    print(len(contours_sorted))
+    print(cv.contourArea(contours_sorted[len(contours_sorted)//2]))
+    print(statistics.mean([cv.contourArea(con) for con in contours_sorted]))
+    print(statistics.quantiles([cv.contourArea(con) for con in contours_sorted], n=150))  # returns a list of n - 1 cut points separating the intervals.
+    # hier die Konturen mit dem kleinsten Flächeninhalt löschen!!! Problem: Dann werden auch I-Punkte gelöscht.+
+    # diese müssten aber im "Ergänzungsbild" zum Laplacian wiederum noch vorhanden sein.
     # saveimg(last, picture, 'jpgs_sharpened/')
     break
+
+# eventuell kleine Konturen am Rand wegschneiden.
 
 # for index in range(1, 19):
         # print(values[index]-values[index-1])
