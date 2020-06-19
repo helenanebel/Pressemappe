@@ -1,211 +1,106 @@
 import json
-import urllib
+import os
 from urllib import request, parse
-from fuzzywuzzy import fuzz
+from math import ceil
 
-with open("./entities.json", mode="r", encoding="utf-8") as file:
+
+with open("entities.json", mode="r", encoding="utf-8") as file:
     image_list = json.load(file)[0]
 
-# führt eindeutige Dubletten zusammen
-for image in image_list:
+# erstmal nur direkte Beziehungen ermitteln, daher nur Domain/Range spezifisch
+with open("relations.json", mode="r", encoding="utf-8") as file:
+    relations = json.load(file)
 
-    per_list = []
-    loc_list = []
+with open("geo_codes.json", mode="r", encoding="utf-8") as file:
+    geo_codes = json.load(file)
 
-    for entity in image_list[image]:
-        if entity["type"] == "PER":
-            per_list.append(entity["name"])
-        else:
-            loc_list.append(entity["name"])
+if "image_member" not in os.listdir():
+    os.mkdir("image_member")
 
-    per_possible_duplicate_list = []
-    loc_possible_duplicate_list = []
+def build_url(name, type):
+    url = "https://lobid.org/gnd/search?q="
 
-    for name in per_list:
-        temp_per_list = per_list[:per_list.index(name)] + per_list[per_list.index(name) + 1:]
+    for counter, part in enumerate(name.split()):
+        url += parse.quote_plus("(preferredName:" + part) + "+OR+"
+        url += parse.quote_plus("variantName:" + part + ")")
 
-        for other_name in temp_per_list:
+        if counter != (len(name.split()) - 1):
+            url += "+AND+"
 
-            # Simpson == Homer Simpson, andere Minimalwerte möglich
-            if fuzz.token_set_ratio(name, other_name) == 100:
-                if sorted([name, other_name]) not in per_possible_duplicate_list:
-                    per_possible_duplicate_list.append(sorted([name, other_name]))
+    # Individualisierte Person bzw. Geografikum
+    url += "&filter=" + parse.quote_plus("type:")
+    if type == "PER":
+        url += "DifferentiatedPerson"
+    else:
+        url += "PlaceOrGeographicName"
+    url += "&size=1000&format=json"
 
-    for name in loc_list:
-        temp_loc_list = loc_list[:loc_list.index(name)] + loc_list[loc_list.index(name) + 1:]
-
-        for other_name in temp_loc_list:
-
-            if fuzz.token_set_ratio(name, other_name) == 100:
-                if sorted([name, other_name]) not in loc_possible_duplicate_list:
-                    loc_possible_duplicate_list.append(sorted([name, other_name]))
-
-    per_duplicate_list = []
-    loc_duplicate_list = []
-
-    for possible_duplicate in per_possible_duplicate_list:
-        per_duplicate_list += possible_duplicate
-
-    for possible_duplicate in loc_possible_duplicate_list:
-        loc_duplicate_list += possible_duplicate
-
-    for name in per_duplicate_list:
-        if per_duplicate_list.count(name) > 1:
-            for possible_duplicate in per_possible_duplicate_list:
-                if name in possible_duplicate:
-                    per_possible_duplicate_list.remove(possible_duplicate)
-
-    for name in loc_duplicate_list:
-        if loc_duplicate_list.count(name) > 1:
-            for possible_duplicate in loc_possible_duplicate_list:
-                if name in possible_duplicate:
-                    loc_possible_duplicate_list.remove(possible_duplicate)
-
-    for definitive_duplicate in per_possible_duplicate_list:
-        for entity in image_list[image]:
-            if entity["name"] in definitive_duplicate and entity["type"] == "PER":
-                if len(definitive_duplicate) < 3:
-                    definitive_duplicate.append(entity["frequency"])
-                else:
-                    definitive_duplicate[2] += entity["frequency"]
-
-    for definitive_duplicate in loc_possible_duplicate_list:
-        for entity in image_list[image]:
-            if entity["name"] in definitive_duplicate and entity["type"] == "LOC":
-                if len(definitive_duplicate) < 3:
-                    definitive_duplicate.append(entity["frequency"])
-                else:
-                    definitive_duplicate[2] += entity["frequency"]
-
-    per_dict_list = [entity for entity in image_list[image] if (entity["type"] == "PER")]
-    loc_dict_list = [entity for entity in image_list[image] if (entity["type"] == "LOC")]
-
-    for definitive_duplicate in per_possible_duplicate_list:
-        per_dict_list = [entity for entity in per_dict_list if (entity["name"] not in definitive_duplicate[:2])]
-        if len(definitive_duplicate[0]) > len(definitive_duplicate[1]):
-            per_dict_list.append({"name": definitive_duplicate[0], "type": "PER", "frequency": definitive_duplicate[2]})
-        else:
-            per_dict_list.append({"name": definitive_duplicate[1], "type": "PER", "frequency": definitive_duplicate[2]})
-
-    for definitive_duplicate in loc_possible_duplicate_list:
-        loc_dict_list = [entity for entity in loc_dict_list if (entity["name"] not in definitive_duplicate[:2])]
-        if len(definitive_duplicate[0]) > len(definitive_duplicate[1]):
-            loc_dict_list.append({"name": definitive_duplicate[0], "type": "LOC", "frequency": definitive_duplicate[2]})
-        else:
-            loc_dict_list.append({"name": definitive_duplicate[1], "type": "LOC", "frequency": definitive_duplicate[2]})
-
-    image_list[image] = per_dict_list + loc_dict_list
+    return url
 
 
-# Vornamen Nachname -> Nachname, Vornamen
-for image in image_list:
-    for entity in image_list[image]:
-        if entity["type"] == "PER":
-            entity_name_split = entity["name"].split()
-            if len(entity_name_split) > 1:
-                entity_new_name = entity_name_split[-1] + ","
+def get_member(url):
+    req = request.Request(url)
+    with request.urlopen(req) as response:
+        json_response = response.read()
+    json_response = json_response.decode("utf-8")
+    json_response = json.loads(json_response)
 
-                for particial_name in entity_name_split[:-1]:
-                    entity_new_name += " " + particial_name
+    count = json_response["totalItems"]
+    start = 0
+    member = []
 
-                entity["name"] = entity_new_name
-
-
-# ID und Label
-rel_id_list = [
-    "placeOfBirth",
-    "placeOfDeath",
-    "placeOfExile",
-    "placeOfActivity",
-    "familialRelationship",
-    "professionalRelationship",
-    "aquaintanceshipOrFriendship",
-    "relatedPerson",
-    "relatedPlaceOrGeographicName",
-    "place",
-    "characteristicPlace",
-    "hierarchicalSuperiorOfPlaceOrGeographicName",
-    "buildingOwner",
-    "architect",
-    "startingOrFinalPointOfADistance"
-]
-
-# Freitext
-rel_text_list = [
-    "definition",
-    "biographicalOrHistoricalInformation"
-]
-
-
-for image in image_list:
-    for entity in image_list[image]:
-        search_url = "https://lobid.org/gnd/search?q="
-
-        # erstmal nur Felder für Namen durchsuchen
-        search_url += urllib.parse.quote_plus("preferredName:")
-        search_url += "\"" + urllib.parse.quote_plus(entity["name"]) + "\""  # exakte Suche
-
-        search_url += "+OR+"
-
-        search_url += urllib.parse.quote_plus("variantName:")
-        search_url += "\"" + urllib.parse.quote_plus(entity["name"]) + "\""
-
-        # Typ
-        search_url += "&filter=" + urllib.parse.quote_plus("type:")
-        if entity["type"] == "PER":
-            search_url += "DifferentiatedPerson"
-        else:
-            search_url += "PlaceOrGeographicName"
-
-        # Menge und Ausgabeformat
-        search_url += "&size=1000&format=json"
-
-        # hier weitermachen
-
-        req = urllib.request.Request(search_url)
-        with urllib.request.urlopen(req) as response:
+    for c in range(ceil(count / 1000)):
+        url += "&from=" + str(start)
+        req = request.Request(url)
+        with request.urlopen(req) as response:
             json_response = response.read()
-        json_response = json_response.decode('utf-8')
+        json_response = json_response.decode("utf-8")
         json_response = json.loads(json_response)
+        member.extend(json_response["member"])
+        start += 1000
 
-        if json_response["totalItems"] < 1:
-            entity["possibleGndId"] = [] # mit anderen Einstellungen wiederholen
-        else: # hier fehlt noch Schleife bei mehr als 1000 Treffern
-            entity["possibleGndId"] = []
-            for gnd_entity in json_response["member"]:
-
-                # jeder Treffer als Liste anlegen
-                possible_gnd_id_list = []
-
-                # 1. Element: Identifier als String
-                possible_gnd_id_list.append(gnd_entity["gndIdentifier"])
-
-                gnd_id_relation_list = []
-
-                # 2. Element: Beziehungen zu anderen Identifiern als Strings in Liste
-                for rel_field in rel_id_list:
-                    try:
-                        for relation in gnd_entity[rel_field]:
-                            gnd_id_relation_list.append(relation["id"][22:])
-                    except KeyError:
-                        continue
-
-                possible_gnd_id_list.append(gnd_id_relation_list)
-
-                gnd_text_relation_list = []
-
-                # 3. Element: Freitext-Beschreibungen als Strings in Liste
-                for rel_field in rel_text_list:
-                    try:
-                        for information in gnd_entity[rel_field]:
-                            gnd_text_relation_list.append(information)
-                    except KeyError:
-                        continue
-
-                possible_gnd_id_list.append(gnd_text_relation_list)
-
-                entity["possibleGndId"].append(possible_gnd_id_list)
+    return member
 
 
-with open("./gnd_ids_relation.json", mode="w+", encoding="utf-8") as file:
-    json.dump([image_list], file)
+def get_data(member_list):
+    member_list_slim = []
+    for member in member_list:
+        gnd = {"identifier": member["gndIdentifier"], "names": [], "relations": [], "descriptions": []}
+
+        gnd["names"].append(member["preferredName"])
+        try:
+            for name in member["variantName"]:
+                gnd["names"].append(name)
+        except KeyError:
+            continue
+
+        for field in relations["relation"]:
+            try:
+                for relation in member[field]:
+                    gnd["relations"].append(relation["id"][22:])
+            except KeyError:
+                continue
+
+        for field in relations["descriptions"]:
+            try:
+                for text in member[field]:
+                    gnd["descriptions"].append(text)
+            except KeyError:
+                continue
+
+        member_list_slim.append(gnd)
+    return member_list_slim
+
+
+for image in image_list:
+    for entity in image_list[image]:
+        url = build_url(entity["name"], entity["type"])
+
+        member_list = get_member(url)
+
+        member_list = get_data(member_list)
+
+        entity["possible_gnd"] = member_list
+
+    with open("image_member/" + image.replace(".JPG", ".json"), "w+") as file:
+        json.dump(image_list[image], file, indent=4)
