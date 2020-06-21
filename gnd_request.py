@@ -50,14 +50,18 @@ def get_member(url):
     member = []
 
     for c in range(ceil(count / 1000)):
-        url += "&from=" + str(start)
-        req = request.Request(url)
+
+        loop_url = url + "&from=" + str(start)
+        print(loop_url)
+        req = request.Request(loop_url)
         with request.urlopen(req) as response:
             json_response = response.read()
         json_response = json_response.decode("utf-8")
         json_response = json.loads(json_response)
         member.extend(json_response["member"])
         start += 1000
+        if start > 25000: # andere Methode nötig für mehr Daten
+            break
 
     return member
 
