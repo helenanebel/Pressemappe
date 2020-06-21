@@ -60,7 +60,7 @@ def get_member(url):
         json_response = json.loads(json_response)
         member.extend(json_response["member"])
         start += 1000
-        if start > 25000: # andere Methode nötig für mehr Daten
+        if start > 24000: # andere Methode nötig für mehr Daten
             break
 
     return member
