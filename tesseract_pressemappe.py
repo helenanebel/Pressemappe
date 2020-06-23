@@ -18,6 +18,7 @@ def get_text_files_from_jpgs(jpg_names_list, dir_path):
         txt_name = jpg_name.replace('.jpg', '').replace('.JPG', '')
         try:
             pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+            print(dir_path + jpg_name)
             text = str(pytesseract.image_to_string(cv.imread(dir_path + jpg_name)))
             # print(text.replace('\n', ' '))
             # print(len(text))
@@ -38,7 +39,6 @@ def get_text_files_from_jpgs(jpg_names_list, dir_path):
 
             if lang_code == 'deu':
                 text = str(pytesseract.image_to_string(cv.imread(dir_path + jpg_name), lang='deu_frak'))
-                # das scheint alles NOCH schlimmer zu machen von der Qualität
                 # print(text.replace('\n', ' '))
             text.encode('utf8')
             # print(text.replace('\n', ' '))
@@ -53,4 +53,4 @@ def get_text_files_from_jpgs(jpg_names_list, dir_path):
 
 if __name__ == '__main__':
     jpg_names_list = os.listdir('jpgs_sharpened')
-    get_text_files_from_jpgs(jpg_names_list, 'jpgs_sharpened')
+    get_text_files_from_jpgs(jpg_names_list, 'jpgs_sharpened/')
