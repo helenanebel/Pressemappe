@@ -25,6 +25,7 @@ def get_jpgs():
             per_folder_page = per_folder_page.decode('utf-8')
             per_folder_soup = BeautifulSoup(per_folder_page, 'html.parser')
             for per_xml_url in [per_folder_url + tr for tr in [tr.find('a')['href'] for tr in per_folder_soup.find_all('tr') if tr.find('a')] if '.xml' in tr]:
+                print(per_xml_url)
                 req = urllib.request.Request(per_xml_url)
                 with urllib.request.urlopen(req) as response:
                     per_xml_page = response.read()
