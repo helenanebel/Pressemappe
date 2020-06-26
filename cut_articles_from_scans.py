@@ -1,20 +1,12 @@
 import cv2 as cv
 import os
 import numpy as np
-
-
-def saveimg(img, picture, output_path):
-    try:
-        cv.imwrite(output_path + picture, img)
-    except:
-        print('writing file failed', img)
-
-
-def color_to_gray(img):
-    return cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+from img_methods import color_to_gray, save_img
+import math
 
 
 picture_nr = 0
+all_max_shapes = []
 for picture in os.listdir('jpgs'):
     if picture_nr > 1000:
         break
@@ -24,18 +16,23 @@ for picture in os.listdir('jpgs'):
     gray = color_to_gray(img)
 
     ret, new = cv.threshold(gray, 85, 255, cv.THRESH_BINARY)
-    blur = cv.GaussianBlur(new, (71, 71), 0)
+    blur = cv.GaussianBlur(new, (225,151), 0)
     ret2, th2 = cv.threshold(blur, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-    blur = cv.GaussianBlur(th2, (71, 71), 0)
+    blur = cv.GaussianBlur(th2, (225,151), 0)
     ret3, th3 = cv.threshold(blur, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-    blur = cv.GaussianBlur(th3, (71, 71), 0)
+    blur = cv.GaussianBlur(th3, (225,151), 0)
     ret4, th4 = cv.threshold(blur, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-    blur = cv.GaussianBlur(th4, (71, 71), 0)
+    blur = cv.GaussianBlur(th4, (225,151), 0)
     ret5, th5 = cv.threshold(blur, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-    contours, hierarchy = cv.findContours(th5, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
-    contours_sorted = sorted(contours, key=cv.contourArea)
 
-    largest_area = contours_sorted[-2]
+    contours, hierarchy = cv.findContours(th5, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+    inner_contours = [con for con in contours if cv.contourArea(con) not in [9931053, 9943198]]
+    contours_sorted = sorted(inner_contours, key=cv.contourArea)
+    max_log = max([int(math.log10(cv.contourArea(con))) for con in contours_sorted[-10:]])
+    largest_area = contours_sorted[-1]
+    contours_sorted = [con for con in contours_sorted if int(math.log10(cv.contourArea(con))) >= max_log - 1]
+    print([cv.contourArea(con) for con in contours_sorted])
+
 
     mask = np.zeros(img.shape, np.uint8)
     mask.fill(255)
@@ -57,7 +54,6 @@ for picture in os.listdir('jpgs'):
     roi = gray[min_y:max_y, min_x:max_x]
     avg_color_per_row = np.average(roi, axis=0)
     avg_color = np.average(roi, axis=1)
-    print(avg_color)
-    saveimg(roi, picture, 'jpgs_cut/')
+    save_img(roi, picture, 'jpgs_cut/')
 
-# max - und min- und average-values ermitteln und diese verwenden, um das weitere Vorgehen zu bestimmen.
+print(all_max_shapes)
