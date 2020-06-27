@@ -8,18 +8,24 @@ import cv2 as cv
 # für moritz die Texte generieren zum Zugriff auf die Beschreibung
 # https://pm20.zbw.eu/list/publication/
 
-def get_text_files_from_jpgs(jpg_names_list, dir_path):
-    if 'pressemappe_text_files' not in os.listdir('C://Users/Helena_Nebel/PycharmProjects/Pressemappe'):
-        os.mkdir('pressemappe_text_files')
-    jpg_nr = 0
+
+def get_jpg_names_list(source_dir_path: str):
+    return os.listdir(source_dir_path)
+
+def get_text_files_from_jpgs(source_dir_path: str = 'jpgs',
+                             jpg_names_list: list = get_jpg_names_list('jpgs'),
+                             target_dir_path: str = 'pressemappe_text_files',
+                             tesseract_dir_path: str = r'C:\Program Files\Tesseract-OCR\tesseract.exe',
+                             path_name: str = 'C://Users/Helena_Nebel/PycharmProjects/Pressemappe'):
+    if target_dir_path not in os.listdir(path_name):
+        os.mkdir(target_dir_path)
     for jpg_name in jpg_names_list:
         lang_code=None
         print(jpg_name)
         txt_name = jpg_name.replace('.jpg', '').replace('.JPG', '')
         try:
-            pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-            print(dir_path + jpg_name)
-            text = str(pytesseract.image_to_string(cv.imread(dir_path + jpg_name)))
+            pytesseract.pytesseract.tesseract_cmd = tesseract_dir_path
+            text = str(pytesseract.image_to_string(cv.imread(source_dir_path + '/' + jpg_name)))
             # print(text.replace('\n', ' '))
             # print(len(text))
             language=language_codes.resolve(detect(text))
@@ -35,15 +41,11 @@ def get_text_files_from_jpgs(jpg_names_list, dir_path):
                     lang_code='spa'
             else:
                 lang_code = 'deu'
-            text = str(pytesseract.image_to_string(cv.imread(dir_path + jpg_name), lang=lang_code))
-
+            text = str(pytesseract.image_to_string(cv.imread(source_dir_path + '/' + jpg_name), lang=lang_code))
             if lang_code == 'deu':
-                text = str(pytesseract.image_to_string(cv.imread(dir_path + jpg_name), lang='deu_frak'))
-                # print(text.replace('\n', ' '))
+                text = str(pytesseract.image_to_string(cv.imread(source_dir_path + '/' + jpg_name), lang='deu_frak'))
             text.encode('utf8')
-            # print(text.replace('\n', ' '))
-            # print(len(text))
-            with open('pressemappe_text_files/' + txt_name, 'w') as text_file:
+            with open(target_dir_path + '/' + txt_name, 'w') as text_file:
                 text_file.write(text)
         except Exception as e:
             print(e)
@@ -52,5 +54,5 @@ def get_text_files_from_jpgs(jpg_names_list, dir_path):
 
 
 if __name__ == '__main__':
-    jpg_names_list = os.listdir('jpgs_sharpened')
-    get_text_files_from_jpgs(jpg_names_list, 'jpgs_sharpened/')
+    jpg_names_list = get_jpg_names_list('jpgs/')
+    get_text_files_from_jpgs(jpg_names_list=jpg_names_list)
