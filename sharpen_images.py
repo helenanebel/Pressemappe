@@ -15,11 +15,11 @@ for picture in os.listdir('jpgs_cut'):
     picture_nr += 1
     img = cv.imread('jpgs_cut/' + picture)
     gray = color_to_gray(img)
-    gauss_blurred = cv.GaussianBlur(gray, (3, 3), 0, 0)
+    gauss_blurred = cv.GaussianBlur(gray, (5, 3), 0, 0)
     filtered = cv.bilateralFilter(gauss_blurred, 13, 75, 75)
     last = cv.adaptiveThreshold(filtered, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 7)
 
-    save_img(last, 'test_11.JPG', 'jpgs_sharpened/') # geht nur mit .JPG am Ende.
+    save_img(last, 'aktuelles_muster_5_3.jpg', 'jpgs_sharpened/') # geht nur mit .JPG am Ende.
 
-    get_text_files_from_jpgs('jpgs_cut', ['test_11.jpg'], 'jpgs_sharpened/')
+    get_text_files_from_jpgs('jpgs_sharpened', ['aktuelles_muster_5_3.jpg'], 'pressemappe_text_files')
     break
