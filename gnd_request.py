@@ -2,7 +2,7 @@ import json
 import os
 from urllib import request, parse
 from math import ceil
-#from nltk.corpus import stopwords
+from nltk.corpus import stopwords
 
 
 with open("entities.json", mode="r", encoding="utf-8") as file:
@@ -13,6 +13,9 @@ with open("relations.json", mode="r", encoding="utf-8") as file:
 
 with open("geo_codes.json", mode="r", encoding="utf-8") as file:
     geo_codes = json.load(file)
+
+with open("stopword_language.json", mode="r", encoding="utf-8") as file:
+    language_codes = json.load(file)
 
 if "image_member" not in os.listdir():
     os.mkdir("image_member")
@@ -100,26 +103,31 @@ for image in image_list:
 
         member_list = get_member(url)
 
-        # notfalls unscharfe Suche für jedes Zeichen
+        # Stoppwörter filtern
+        if not member_list:
+            if entity["language"] in language_codes:
+                exclude = set(stopwords.words(language_codes[entity["language"]]))
+                name = " ".join([part for part in entity["name"].split() if part.lower() not in exclude])
+                url = build_url(name, entity["type"])
+                member_list = get_member(url)
+
+        # unscharfe Suche für jedes Zeichen
         if not member_list:
             for i, part in enumerate(entity["name"].split()):
                 namelist = entity["name"].split()
                 for index, char in enumerate(part):
                     word = list(part)
-                    word[index] = "*"
+                    word[index] = "*" # alternativ ?
                     word = "".join(word)
                     namelist[i] = word
                     name = " ".join(namelist)
                     url = build_url(name, entity["type"])
-
                     for member in get_member(url):
                         if member not in member_list:
                             member_list.append(member)
+
         member_list = get_data(member_list)
-
         entity["possible_gnd"] = member_list
-
-        # hier später eindeutiges GND-Äquivalent speichern
         entity["gnd"] = []
 
     with open("image_member/" + image.replace(".JPG", ".json"), "w+") as file:
