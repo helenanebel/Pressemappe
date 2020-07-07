@@ -29,21 +29,27 @@ for image_name in os.listdir("image_member"):
         if entity["type"] == "LOC":
             for match in entity["possible_gnd"]:
                 if match["names"].count(entity["name"]) > 0:
-                    entity["gnd"].append(match)
-                    break
-            entity.pop("possible_gnd", None)
+                    if "gnd" not in entity:
+                        entity["gnd"] = match
+                    else:
+                        entity.pop("gnd", None)
+            if "gnd" in entity:
+                entity.pop("possible_gnd", None)
 
         # genaue Übereinstimmung bei Geografika ohne Stoppwörter
-        if not entity["gnd"]:
+        if "gnd" not in entity:
             if entity["type"] == "LOC":
                 for match in entity["possible_gnd"]:
                     if match["names"].count(filtered_name) > 0:
-                        entity["gnd"].append(match)
-                        break
-                entity.pop("possible_gnd", None)
+                        if "gnd" not in entity:
+                            entity["gnd"] = match
+                        else:
+                            entity.pop("gnd", None)
+                if "gnd" in entity:
+                    entity.pop("possible_gnd", None)
 
-        # nur Treffer mit vollständigen Namen behalten
-        if not entity["gnd"] and len(filtered_name.split()) > 1:
+        # nur Treffer mit vollständigen Namen berücksichtigen
+        if "gnd" not in entity and len(filtered_name.split()) > 1:
             delete_match = []
             for match in entity["possible_gnd"]:
                 match_names = match["names"][:]
@@ -74,28 +80,33 @@ for image_name in os.listdir("image_entities"):
     for entity in image:
         filtered_name = filter_stopwords(entity["name"], entity["language"])
 
-        # Beziehungen zu eindeutigen Entitäten abgleichen
         nimage = image[:]
         nimage.remove(entity)
-        if not entity["gnd"] and len(filtered_name.split()) > 1:
+
+        # Beziehungen prüfen, wenn Name aus mehreren Wörtern besteht
+        if "gnd" not in entity and len(filtered_name.split()) > 1:
             most_relations = 0
             for match in entity["possible_gnd"]:
                 relevant_relations = 0
                 for nentity in nimage:
-                    if nentity["gnd"]:
-                        for match2 in nentity["gnd"]:
-                            try:
-                                if (match2["identifier"] in match["relations"]) or (match["identifier"] in match2["relations"]):
-                                    relevant_relations += 1
-                            except KeyError:
-                                continue
+                    if "gnd" in nentity and nentity["gnd"]:
+                        try:
+                            if (nentity["gnd"]["identifier"] in match["relations"]) or (match["identifier"] in nentity["gnd"]["relations"]):
+                                relevant_relations += 1
+                        except KeyError:
+                            continue
                 if relevant_relations == most_relations:
-                    entity["gnd"].append(match)
+                    # Treffer mit meisten Beziehungen auswählen
+                    if "gnd" in entity and entity["gnd"]:
+                        entity.pop("gnd", None)
+                    else:
+                        entity["gnd"] = match
                 elif relevant_relations > most_relations:
-                    entity["gnd"] = [match]
+                    entity["gnd"] = match
                     most_relations = 0 + relevant_relations
 
-            entity.pop("possible_gnd", None)
+            if "gnd" in entity:
+                entity.pop("possible_gnd", None)
 
     with open("image_entities/" + image_name, "w+") as file:
         json.dump(image, file, indent=4)
