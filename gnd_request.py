@@ -2,11 +2,11 @@ import json
 import os
 from urllib import request, parse
 from math import ceil
-from nltk.corpus import stopwords
+from nltk.corpus import stopwords # download_dir=".\\venv\\Lib\\nltk_data"
 
 
 with open("entities.json", mode="r", encoding="utf-8") as file:
-    image_list = json.load(file)[0]
+    image_list = json.load(file)
 
 with open("relations.json", mode="r", encoding="utf-8") as file:
     relations = json.load(file)
@@ -128,7 +128,6 @@ for image in image_list:
 
         member_list = get_data(member_list)
         entity["possible_gnd"] = member_list
-        entity["gnd"] = []
 
     with open("image_member/" + image.replace(".JPG", ".json"), "w+") as file:
         json.dump(image_list[image], file, indent=4)
