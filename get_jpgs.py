@@ -33,6 +33,7 @@ def get_jpg_urls(jpg_amount: int = 2000):
             with urllib.request.urlopen(req) as response:
                 per_xml_page = response.read()
             per_xml_page = per_xml_page.decode('utf-8')
+            print(per_xml_url)
             per_xml_soup = BeautifulSoup(per_xml_page, 'xml')
             jpg_urls += [img_tag['xlink:href'].replace('B.JPG', 'A.JPG') for img_tag in per_xml_soup.find('mets:fileGrp', USE="DEFAULT").find_all('mets:FLocat', LOCTYPE="URL")]
             jpg_nr = len(jpg_urls)
