@@ -67,17 +67,7 @@ for filepath in files:
         end_dict[base_name.replace('txt', 'JPG')] = end_list
         print('Final result', end_dict)
         print(type(end_dict))
-sprachen={"ar": "arabic", "az": "azerbaijani", "da": "danish", "de": "german", "el": "greek", "en": "english", "es": "spanish", "fi": "finnish", "fr": "french", "hu": "hungarian", "id": "indonesian", "it": "italian", "kk": "kazakh", "ne": "nepali", "nl": "dutch", "no": "norwegian", "pt": "portuguese", "ro": "romanian", "ru": "russian", "sl": "slovene", "sv": "swedish", "tg": "tajik", "tr": "turkish"}
-print(end_dict)
 
-        # dict3 = {k: sprachen[v] for k, v in end_dict.items()}
-
-for k, v in end_dict.items():
-    for i in v:
-        for m, w in i.items():
-            if m == "Language":
-                #print(i[m])
-                i[m] = sprachen[w]
 
 
 # Speicherung Dictionary in JSON Datei zur Weiterverarbeitung
@@ -85,4 +75,4 @@ with open('entities.json', mode="r+") as file:
     file.seek(0, 2)
     position = file.tell()
     file.seek(position)
-    file.write(",{}".format(json.dumps(end_dict, indent=1)))
+    file.write(" {}".format(json.dumps(end_dict, indent=1)))
