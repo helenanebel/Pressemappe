@@ -1,0 +1,33 @@
+https://docs.opencv.org/2.4/modules/imgproc/doc/structural_analysis_and_shape_descriptors.html?highlight=drawcontours#drawcontours
+https://stackoverflow.com/questions/48259724/cv2-drawcontours-unfill-circles-inside-characters-python-opencv
+mit Chain approx arbeiten, um die Buchstaben zu harmonisieren?
+
+https://www.pyimagesearch.com/2020/05/25/tesseract-ocr-text-localization-and-detection/
+
+Beim bearbeiten immer gleichzeitig Doku schreiben!!!
+
+Kümmern um: mehrere Scans müssen in ein txt-Dokument rein.
+
+in descriptions.json liegen die Texte zu den Scans.
+
+Bearbeitete files:
+
+get_jpgs
+sharpen_images
+
+Zu bearbeiten:
+
+get_contours
+img_methods
+merge_images
+remove_noise_on_borders
+rotate_files_to_horizontal
+
+
+
+tesseract_pressemappe (um mehrere zusammengehörige jpgs kümmern!!!
+diese müssen erkannt werden!!!)
+cut_articles_from_scans (prüfen, wo noch Probleme auftreten, aber soweit in Ordnung.
+Überschriften fehlen teilweise > kann man das verschmerzen?,
+roi-Erkennung von Kontur mit moments realisieren?
+oder in eine Funktion packen?)

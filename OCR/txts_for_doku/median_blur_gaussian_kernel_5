@@ -1,0 +1,27 @@
+oe UroBboritannten.
+
+Bee Absbioe bea Neqhyten ‘ft cm Dewttertaq abend su
+eutt ‘Bove play up Lowden carqetroficn, Ce iord heate oea
+L.uing Coorp un Waidfor curvei Vehudy abitanena und dort deel
+Tape vevblewen, TGA Cote ML rd um mactin Monat os
+Nayee alt und yore ude pad Wad qu Weiay ant Cuqfands. ulus
+Ved ward und uber ui jeblrendey gefdrrweens Ce AR
+ch Vercutadce Coradynfennoe und fort midit ute Cachtey
+wchend fonder ned fea)3 meuere Sprachen. Ce it fortldruthe
+chant und cin ubsrass ctircger Clrbedter, Ge hoot alle Cport3
+nit Arecit. Mroe$ed Werqiurgca Lecesten (ut feate aclegenthgcit
+elvorhige im Yuromobil tit bie Itbyfye Maite. Seve tutercfiert
+ce iid) far Bie Ranbdiorcticcait. Vtuf feateu Outer bat cv Die meucs
+feat Wafdyinen und Curviduanqcn., cine ecite Ecsichuiny cty.els
+ce burt ecmmer enghiden Mouvercante und etter enqhiden Lehrer
+und fro frubycitiq wurde cx in dle forcwamute YWriegeueSanule
+nid) “en geididt Ue dem veritorbenen Str Eldon Ogorfe
+ledte ce ANP BEjtcHt Bile und curnfo jeHt wily ord LK. QUE,
+
+al. ae LE
+
+last =  cv.medianBlur(cv.medianBlur(gray, 5), 5)
+fil = cv.bilateralFilter(last, 13, 75, 75) # höhere kernel_size besser (13), sigma ist auf 75 oder 100 am Besten, sonst zu verschwommen
+last = cv.adaptiveThreshold(fil, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 7) # Kernel unter 5 und über 15 nicht sinnvoll
+
+Blurring mit einem anderen Kernel als drei ist vollkommen kontraproduktiv.
