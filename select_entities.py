@@ -13,7 +13,6 @@ def filter_stopwords(name, language):
         filter_name = name
     return filter_name
 
-
 if "image_entities" not in os.listdir():
     os.mkdir("image_entities")
 
@@ -67,12 +66,8 @@ for image_name in os.listdir("image_member"):
                 for match in delete_match:
                     entity["possible_gnd"].remove(match)
 
-        nimage = image[:]
-        nimage.remove(entity)
-
     with open("image_member/../image_entities/" + image_name, "w+") as file:
         json.dump(image, file, indent=4)
-
 
 for image_name in os.listdir("image_entities"):
     with open("image_entities/" + image_name, "r") as file:
