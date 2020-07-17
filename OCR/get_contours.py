@@ -4,7 +4,6 @@ import numpy as np
 import statistics
 from OCR.img_methods import color_to_gray, save_img
 
-
 def get_contours(picture, do_save_img: bool = True,
                  source_dir_path: str = 'jpgs_cut', target_dir_path: str = 'jpgs_contours'):
     print(picture)
@@ -59,7 +58,7 @@ def get_contours(picture, do_save_img: bool = True,
     erosion = cv.dilate(opening, (2, 2), iterations=1)
     if do_save_img:
         save_img(erosion, target_dir_path + '/' + picture, 'jpgs_contours/')
-
+    return erosion
 
 if __name__ == '__main__':
     jpgs_list = os.listdir('jpgs_cut')
