@@ -6,8 +6,9 @@ from OCR.img_methods import save_img, color_to_gray
 
 
 def sharpen_images_and_get_text_files(jpg_list: list, source_directory: str,
-                                      target_directory: str):
+                                      target_directory: str = 'sharpened_jpgs', do_save_img: bool = True):
     picture_nr = 0
+    results_list = []
     for picture in jpg_list:
         print(picture)
         if picture_nr > 1000:
@@ -26,10 +27,12 @@ def sharpen_images_and_get_text_files(jpg_list: list, source_directory: str,
         filtered = cv.bilateralFilter(gauss_blurred, 13, 75, 75)
         last = cv.adaptiveThreshold(filtered, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 7)
         # hier noch eroden oder closen?
-        save_img(last, picture, target_directory + '/') # geht nur mit .JPG am Ende.
-        print(gray.shape)
-        # get_text_files_from_jpgs('jpgs_sharpened', [picture], 'pressemappe_text_files')
+        if do_save_img:
+            save_img(last, picture, target_directory + '/') # geht nur mit .JPG am Ende.
+        results_list.append(last)
+    return results_list
+    # get_text_files_from_jpgs('jpgs_sharpened', [picture], 'pressemappe_text_files')
 
 
 if __name__ == '__main__':
-    sharpen_images_and_get_text_files(os.listdir('jpgs'), 'jpgs', 'jpgs_sharpened_not_cut')
+    sharpen_images_and_get_text_files(['0000xx_000012_000xx_00001_PIC_P000012000000191479000010000_0000_00000000HP_A.txt'], 'jpgs_cut', 'jpgs_sharpened')
