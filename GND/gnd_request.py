@@ -2,7 +2,7 @@ import json
 import os
 from urllib import request, parse
 from math import ceil
-from nltk.corpus import stopwords # download_dir=".\\venv\\Lib\\nltk_data"
+from nltk.corpus import stopwords
 
 
 with open("entities.json", mode="r", encoding="utf-8") as file:
