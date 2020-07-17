@@ -1,18 +1,19 @@
 import cv2 as cv
 import statistics
-from OCR.img_methods import color_to_gray, rotate_by_degree
+from OCR.img_methods import color_to_gray, rotate_by_degree, save_img
+from scipy import stats
 # from scipy.signal import argrelextrema
 
 
 def determine_rotation_degree_and_rotate(img_list: list):
     picture_nr = 0
     for picture in img_list:
+
         print(picture)
         if picture_nr > 1000:
             break
         picture_nr += 1
         img = cv.imread('jpgs_sharpened/' + picture)
-        gray = color_to_gray(img)
         degree_values = {}
         degree_dicts = {}
         for degree in range(-10, 10, 1):
@@ -20,7 +21,7 @@ def determine_rotation_degree_and_rotate(img_list: list):
                 degree_dicts[str(degree)] = {}
             deg = degree/10
             print(deg)
-            gray = rotate_by_degree(gray, deg)
+            gray = rotate_by_degree(color_to_gray(img), deg)
             total_rows_to_delete = []
             total_columns_to_delete = []
             cleaned_rows_to_delete = []
@@ -38,13 +39,13 @@ def determine_rotation_degree_and_rotate(img_list: list):
                         pixel_list = gray[column]
                     region_list = [pixel_list[i:i + region_length] for i in range(0, len(pixel_list), region_length)]
                     regions_with_characters = [0 if statistics.mean(region) >= 200 else 1 for region in region_list]
-                    if sum(regions_with_characters) <= len(region_list)*0.2:
+                    if sum(regions_with_characters) <= len(region_list)*0.35:
                         region_nr = 0
                         if region_nr not in [0, 1, len(region_list)-1, len(region_list)-2, len(region_list) - 3]:
                             if sum(regions_with_characters[region_nr-2:region_nr+3]) > 2:
                                 regions_with_characters[region_nr] = 1
                             region_nr += 1
-                    if sum(regions_with_characters) <= len(region_list) * 0.2:
+                    if sum(regions_with_characters) <= len(region_list) * 0.35:
                         if dimension == 0:
                             total_rows_to_delete.append(column)
                             to_delete_nr += 1
@@ -54,49 +55,47 @@ def determine_rotation_degree_and_rotate(img_list: list):
             for i in total_rows_to_delete[:-3]:
                 cleaned_rows_to_delete.append(i)
                 if any(row for row in range(i + 1, i + 3) if row not in total_rows_to_delete):
-                    print(i)
-                    print(True)
                     break
-            # Diese Funktion hier funktioniert.
-            # Das hier nicht:
-            print(len(total_rows_to_delete), total_rows_to_delete)
-            '''
             total_rows_to_delete.reverse()
-            print(total_rows_to_delete)
             for i in total_rows_to_delete:
                 cleaned_rows_to_delete.append(i)
-                if any(column for column in range(i - 1, i - 3) if column not in total_rows_to_delete):
+                if any(column for column in range(i - 1, i - 3, -1) if column not in total_rows_to_delete):
                     break
-            print(to_delete_nr)
-            print(cleaned_rows_to_delete)
-            
-                
-            print(deg)
-            
-            # die Daten werden nicht mehr bereinigt!!!
-            # funktioniert nicht mehr!!!!!
-            '''
-        '''
+            for i in total_columns_to_delete[:-3]:
+                cleaned_columns_to_delete.append(i)
+                if any(row for row in range(i + 1, i + 3) if row not in total_columns_to_delete):
+                    break
+            total_columns_to_delete.reverse()
+            for i in total_columns_to_delete:
+                cleaned_columns_to_delete.append(i)
+                if any(column for column in range(i - 1, i - 3, -1) if column not in total_columns_to_delete):
+                    break
+            degree_values[str(degree)] = to_delete_nr
+            degree_dicts[str(degree)]['columns'] = cleaned_columns_to_delete
+            degree_dicts[str(degree)]['rows'] = cleaned_rows_to_delete
         sorted_values = sorted(degree_values.items(), key=lambda x: x[1], reverse=True)
         print(sorted_values)
         minimals = [int(val[0]) for val in sorted_values[:10]]
+        print(minimals)
         m = stats.trim_mean(minimals, 0.2)
-        gray = rotate_by_degree(gray, m)
+        print(int(m))
+        print(int(m)/10)
+        gray = color_to_gray(img)
+        gray = rotate_by_degree(gray, int(m)/10)
         print(degree_dicts)
         print(degree_dicts[str(int(m))])
         for key in degree_dicts[str(int(m))]:
-            if key == 'columns_to_delete':
-                for column in degree_dicts[str(int(m))]['columns_to_delete]:
-                    for i in range(gray.shape[1]):
-                    gray[column, i] = 255
+            if key == 'columns':
+                for column in degree_dicts[str(int(m))]['columns']:
+                    for i in range(gray.shape[0]):
+                        gray[i, column] = 255
             else:
-            for row in degree_dicts[str(int(m))]['columns_to_delete]:
-                for i in range(gray.shape[0]):
-                    gray[i, column] = 255
+                for row in degree_dicts[str(int(m))]['rows']:
+                    for i in range(gray.shape[1]):
+                        gray[row, i] = 255
         save_img(gray, picture, 'jpgs_rotated/') # geht nur mit .JPG am Ende.
-        '''
 
 
 if __name__ == '__main__':
-    determine_rotation_degree_and_rotate(['aktuelles_muster_5_3.jpg'])
+    determine_rotation_degree_and_rotate(['0000xx_000012_000xx_00008_PIC_P000012000000000000000080001_0000_00000000HP_A.JPG'])
 
