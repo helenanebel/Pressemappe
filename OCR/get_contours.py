@@ -2,29 +2,13 @@ import cv2 as cv
 import os
 import numpy as np
 import statistics
+from OCR.img_methods import color_to_gray, save_img
 
 
-# from scipy.signal import argrelextrema
-
-
-def saveimg(img, picture, output_path):
-    try:
-        cv.imwrite(output_path + picture, img)
-    except:
-        print('writing file failed', img)
-
-
-def color_to_gray(img):
-    return cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-
-picture_nr = 0
-for picture in os.listdir('jpgs_cut'):
+def get_contours(picture, do_save_img: bool = True,
+                 source_dir_path: str = 'jpgs_cut', target_dir_path: str = 'jpgs_contours'):
     print(picture)
-    if picture_nr > 1000:
-        break
-    picture_nr += 1
-    img = cv.imread('jpgs_cut/' + picture)
+    img = cv.imread(source_dir_path + '/' + picture)
     gray = color_to_gray(img)
     if gray.shape[1]%2 == 0:
         print(gray.shape)
@@ -34,7 +18,7 @@ for picture in os.listdir('jpgs_cut'):
         gray = np.r_[gray, new_column]
     print(gray.shape)
     last = cv.GaussianBlur(gray, (5, 3), 0, 0)
-    fil = cv.bilateralFilter(last, 5, 75, 75)  # höhere kernel_size besser (13), sigma ist auf 75 oder 100 am Besten, sonst zu verschwommen
+    fil = cv.bilateralFilter(last, 5, 75, 75)
     last = cv.adaptiveThreshold(fil, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 7)  # Kernel unter 5 und über 15 nicht sinnvoll
 
     cons, hierarchy = cv.findContours(last, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
@@ -63,40 +47,20 @@ for picture in os.listdir('jpgs_cut'):
             cv.drawContours(mask, [cons[con_nr]], 0, (255, 255, 255), -1, lineType=8)  # Draw contours on the colour image
         con_nr += 1
 
-
-    # Auslese der Konturen:
-    # eventuell weniger sinnvoll als angenommen?
-    mean_second_level = statistics.median([cv.contourArea(cons[con_nr]) for con_nr in second_level_contour_indices])
     mean_third_level = statistics.median([cv.contourArea(cons[con_nr]) for con_nr in third_level_contour_indices])
-    for con_nr in top_level_contour_indices:
-        cv.drawContours(mask, [cons[con_nr]], 0, (255, 255, 255), -1, lineType=8)
     for con_nr in second_level_contour_indices:
         if cv.contourArea(cons[con_nr]) > mean_third_level:
-            cv.drawContours(mask, [cons[con_nr]], 0, 0, -1, lineType=8)  # Draw contours on the colour image
-            # Parameter definieren
+            cv.drawContours(mask, [cons[con_nr]], 0, 0, -1, lineType=8)
             cv.drawContours(mask, [cons[con_nr]], 0, (255, 255, 255), 1, lineType=8)
     for con_nr in third_level_contour_indices:
-        #if cv.contourArea(cons[con_nr]) > mean_third_level*0.5:
-            cv.drawContours(mask, [cons[con_nr]], 0, (255, 255, 255), -1, lineType=8)  # Draw contours on the colour image
+        cv.drawContours(mask, [cons[con_nr]], 0, (255, 255, 255), -1, lineType=8)
 
-    # new_gray = color_to_gray(mask)
-
-    opening = mask
-    # opening = cv.morphologyEx(mask, cv.MORPH_OPEN, (3, 3))
+    opening = cv.dilate(mask, (2, 2), iterations=1)
     erosion = cv.dilate(opening, (2, 2), iterations=1)
-    erosion = cv.dilate(erosion, (2, 2), iterations=1)
-    # a_del = np.delete(erosion, 1, 0)
-    # print(a_del.shape)
-    # a_del = np.delete(a_del, 1, 0)
-    # print(a_del.shape)
+    if do_save_img:
+        save_img(erosion, target_dir_path + '/' + picture, 'jpgs_contours/')
 
 
-    saveimg(erosion, 'aktuelle_konturen_erosion_2_2_closing_2_2_double.jpg', 'jpgs_sharpened/')
-    # saveimg(negative, 'contours_white_border_linetype_8_hierarchy_respected_fil_5_neg.jpg', 'jpgs_sharpened/')
-    # get_text_files_from_jpgs('jpgs_sharpened', ['contours_white_border_linetype_8_hierarchy_respected_fil_5.jpg'])
-
-    # Berechnung der Durchschnittsfarbe!!!!
-    # avg_color_per_row = np.average(roi, axis=0)
-    # avg_color = np.average(roi, axis=1)
-    # print(avg_color)
-    break
+if __name__ == '__main__':
+    jpgs_list = os.listdir('jpgs_cut')
+    get_contours(jpgs_list)
