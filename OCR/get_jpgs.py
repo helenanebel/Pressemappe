@@ -41,10 +41,10 @@ def get_jpg_urls(jpg_amount: int = 2000):
     return jpg_urls
 
 
-def get_jpgs(jpg_url_list: list = get_jpg_urls(250),
+def get_jpgs(jpg_url_list: list ,
              path_name: str = 'C://Users/Helena_Nebel/PycharmProjects/Pressemappe'):
     try:
-        if 'jpgs' not in os.listdir(path_name):
+        if 'jpgs' not in os.listdir(path_name + '/OCR'):
             os.mkdir('jpgs')
         print(len(jpg_url_list))
         for jpg_url in jpg_url_list:
@@ -56,4 +56,5 @@ def get_jpgs(jpg_url_list: list = get_jpg_urls(250),
 
 
 if __name__ == '__main__':
-    get_jpgs()
+    jpg_list = get_jpg_urls(5000)
+    get_jpgs(jpg_list)
