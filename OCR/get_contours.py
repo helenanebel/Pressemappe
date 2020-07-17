@@ -4,17 +4,19 @@ import numpy as np
 import statistics
 from OCR.img_methods import color_to_gray, save_img
 
+
 def get_contours(picture, do_save_img: bool = True,
                  source_dir_path: str = 'jpgs_cut', target_dir_path: str = 'jpgs_contours'):
-    print(picture)
     img = cv.imread(source_dir_path + '/' + picture)
     gray = color_to_gray(img)
+    # sollte man das auch für das zweite Bild machen?
     if gray.shape[1]%2 == 0:
         print(gray.shape)
         new_column = np.zeros((1, img.shape[1]), np.uint8)
         print(new_column.shape)
         new_column.fill(255)
         gray = np.r_[gray, new_column]
+        # verhindert, dass sich die Reihen nach unten verschieben; gibt beim merge Probleme.
     print(gray.shape)
     last = cv.GaussianBlur(gray, (5, 3), 0, 0)
     fil = cv.bilateralFilter(last, 5, 75, 75)
@@ -59,6 +61,7 @@ def get_contours(picture, do_save_img: bool = True,
     if do_save_img:
         save_img(erosion, target_dir_path + '/' + picture, 'jpgs_contours/')
     return erosion
+
 
 if __name__ == '__main__':
     jpgs_list = os.listdir('jpgs_cut')
