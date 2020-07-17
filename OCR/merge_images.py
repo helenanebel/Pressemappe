@@ -1,8 +1,8 @@
 import cv2 as cv
 from OCR.img_methods import save_img
-from OCR.tesseract_pressemappe import get_text_files_from_jpgs
 from OCR.get_contours import get_contours
 import numpy as np
+import os
 
 
 def merge_pictures(picture: str, do_save_img: bool = True):
@@ -24,4 +24,5 @@ def merge_pictures(picture: str, do_save_img: bool = True):
 
 
 if __name__ == '__main__':
-    merge_pictures('0000xx_000010_000xx_00001_PIC_P000010000000000000000010000_0000_00000000HP_A.JPG')
+    for picture in os.listdir('jpgs_cut'):
+        merge_pictures(picture)
