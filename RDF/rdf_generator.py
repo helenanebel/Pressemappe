@@ -3,7 +3,7 @@ import json
 from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, DCTERMS
 
-
+# Liste aller Entitäten
 total = []
 for image_name in os.listdir("../GND/image_entities"):
     with open("../GND/image_entities/" + image_name, "r") as file:
@@ -23,11 +23,11 @@ for image_name in os.listdir("../GND/image_entities"):
     with open("../GND/image_entities/" + image_name, "r") as file:
         image = json.load(file)
 
-    image_name = image_name.replace(".json", "")
-    url = "http://webopac.hwwa.de/DigiPerson/P/" + image_name.replace("_", "/", 5) + ".JPG"
+    # Link zu Dokument
+    document_url = "http://webopac.hwwa.de/PresseMappe20Bookmark/PM20bm.cfm?mid=P" + image_name[7:13] + "&dn=" + str(int(image_name[20:25]))
+    graph.add((URIRef(document_url), RDF.type, DCTERMS.BibliographicResource))
 
-    graph.add((URIRef(url), RDF.type, DCTERMS.BibliographicResource))
-
+    # hier übergeordnete Publikation und Beziehung ergänzen
 
     for entity in image:
         if "gnd" in entity:
@@ -40,8 +40,8 @@ for image_name in os.listdir("../GND/image_entities"):
 
             graph.add((URIRef("https://d-nb.info/gnd/" + entity_id), GND.preferredName, Literal(entity["gnd"]["names"][0])))
 
-            graph.add((URIRef("https://d-nb.info/gnd/" + entity_id), DCTERMS.isReferencedBy, URIRef(url)))
-            graph.add((URIRef(url), DCTERMS.references, URIRef("https://d-nb.info/gnd/" + entity_id)))
+            graph.add((URIRef("https://d-nb.info/gnd/" + entity_id), DCTERMS.isReferencedBy, URIRef(document_url)))
+            graph.add((URIRef(document_url), DCTERMS.references, URIRef("https://d-nb.info/gnd/" + entity_id)))
 
             for relation_id in entity["gnd"]["relations"]:
                 if relation_id in total and relation_id != entity_id:
