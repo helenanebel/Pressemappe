@@ -17,8 +17,8 @@ with open("geo_codes.json", mode="r", encoding="utf-8") as file:
 with open("stopword_language.json", mode="r", encoding="utf-8") as file:
     language_codes = json.load(file)
 
-if "image_member" not in os.listdir():
-    os.mkdir("image_member")
+if "article_member" not in os.listdir():
+    os.mkdir("article_member")
 
 def build_url(name, type):
     url = "https://lobid.org/gnd/search?q="
@@ -71,7 +71,7 @@ def get_member(url):
 def get_data(member_list):
     member_list_slim = []
     for member in member_list:
-        gnd = {"identifier": member["gndIdentifier"], "names": [], "relations": [], "descriptions": []}
+        gnd = {"identifier": member["gndIdentifier"], "names": [], "relations": []}
         gnd["names"].append(member["preferredName"])
 
         if "variantName" in member:
@@ -89,10 +89,6 @@ def get_data(member_list):
                 if code in geo_codes and code not in gnd["relations"] and code != gnd["identifier"]:
                     gnd["relations"].append(geo_codes[code])
 
-        for field in relations["descriptions"]:
-            if field in member:
-                for text in member[field]:
-                    gnd["descriptions"].append(text)
         member_list_slim.append(gnd)
     return member_list_slim
 
@@ -129,5 +125,5 @@ for image in image_list:
         member_list = get_data(member_list)
         entity["possible_gnd"] = member_list
 
-    with open("image_member/" + image.replace(".JPG", ".json"), "w+") as file:
+    with open("article_member/" + image.replace(".JPG", ".json"), "w+") as file:
         json.dump(image_list[image], file, indent=4)
