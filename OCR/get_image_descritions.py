@@ -38,9 +38,12 @@ def get_jpg_descriptions(jpg_amount: int = 2000):
                 doc_nr = 'doc' + re.findall(r'_([^_]+)_PIC', jpg_name)[0]
                 article_description = per_xml_soup.find('mets:structMap', TYPE="LOGICAL").find('mets:div', ID=doc_nr)['LABEL']
                 if 'Presseartikel' not in article_description:
-                    all_descriptions[jpg_name] = article_description
+                    all_descriptions[jpg_name] = \
+                        article_description.replace('[', '(').replace(']', ')').replace('{', '(').replace('}', ')')
+                        # notwendig, weil sonst das JSON nicht gelesen werden kann.
     with open('descriptions.json', 'w') as file:
         json.dump(all_descriptions, file)
+
 
 if __name__ == '__main__':
     get_jpg_descriptions()

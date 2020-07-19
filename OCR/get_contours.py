@@ -11,19 +11,15 @@ def get_contours(picture, do_save_img: bool = True,
     gray = color_to_gray(img)
     # sollte man das auch für das zweite Bild machen?
     if gray.shape[1]%2 == 0:
-        print(gray.shape)
         new_column = np.zeros((1, img.shape[1]), np.uint8)
-        print(new_column.shape)
         new_column.fill(255)
         gray = np.r_[gray, new_column]
         # verhindert, dass sich die Reihen nach unten verschieben; gibt beim merge Probleme.
-    print(gray.shape)
     last = cv.GaussianBlur(gray, (5, 3), 0, 0)
     fil = cv.bilateralFilter(last, 5, 75, 75)
     last = cv.adaptiveThreshold(fil, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 7)  # Kernel unter 5 und über 15 nicht sinnvoll
 
     cons, hierarchy = cv.findContours(last, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
-    print(len(hierarchy[0]))
 
     mask = np.zeros(gray.shape, np.uint8)
     mask.fill(255)
@@ -35,7 +31,6 @@ def get_contours(picture, do_save_img: bool = True,
         if con_hierarchy[3] == -1:
             top_level_contour_indices.append(con_nr)
         con_nr += 1
-    print(top_level_contour_indices)
     con_nr = 0
     for con_hierarchy in hierarchy[0]:
         if con_hierarchy[3] in top_level_contour_indices:
@@ -56,8 +51,8 @@ def get_contours(picture, do_save_img: bool = True,
     for con_nr in third_level_contour_indices:
         cv.drawContours(mask, [cons[con_nr]], 0, (255, 255, 255), -1, lineType=8)
 
-    opening = cv.dilate(mask, (2, 2), iterations=1)
-    erosion = cv.dilate(opening, (2, 2), iterations=1)
+    opening = cv.dilate(mask, (3, 3), iterations=2)
+    erosion = cv.dilate(opening, (3, 3), iterations=2)
     if do_save_img:
         save_img(erosion, target_dir_path + '/' + picture, 'jpgs_contours/')
     return erosion

@@ -6,23 +6,19 @@ from OCR.img_methods import save_img, color_to_gray
 
 
 def sharpen_images_and_get_text_files(jpg_list: list, source_directory: str,
-                                      target_directory: str = 'sharpened_jpgs', do_save_img: bool = True):
+                                      target_directory: str = 'jpgs_sharpened', do_save_img: bool = True):
     picture_nr = 0
     results_list = []
     for picture in jpg_list:
-        print(picture)
         if picture_nr > 1000:
             break
         picture_nr += 1
         img = cv.imread(source_directory + '/' + picture)
         gray = color_to_gray(img)
         if gray.shape[1]%2 == 0:
-            print(gray.shape)
             new_column = np.zeros((1, img.shape[1]), np.uint8)
-            print(new_column.shape)
             new_column.fill(255)
             gray = np.r_[gray, new_column]
-        print(gray.shape)
         gauss_blurred = cv.GaussianBlur(gray, (5, 3), 0, 0)
         filtered = cv.bilateralFilter(gauss_blurred, 13, 75, 75)
         last = cv.adaptiveThreshold(filtered, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 7)

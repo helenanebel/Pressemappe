@@ -3,6 +3,7 @@ import language_codes
 from langdetect import detect
 import os
 import cv2 as cv
+import sys
 
 # Tesseract liegt in: C:\Program Files\Tesseract-OCR
 
@@ -12,8 +13,8 @@ def get_jpg_names_list(source_dir_path: str):
 
 
 def get_text_files_from_jpgs(jpg_names_list: list,
-                             source_dir_path: str = 'jpgs',
-                             target_dir_path: str = 'pressemappe_text_files',
+                             source_dir_path: str = 'jpgs_added',
+                             target_dir_path: str = 'test_added',
                              tesseract_dir_path: str = r'C:\Program Files\Tesseract-OCR\tesseract.exe',
                              path_name: str = 'C://Users/Helena_Nebel/PycharmProjects/Pressemappe/OCR',
                              save_file: bool = True,
@@ -21,6 +22,7 @@ def get_text_files_from_jpgs(jpg_names_list: list,
     if target_dir_path not in os.listdir(path_name):
         os.mkdir(target_dir_path)
     last_file = ''
+    jpg_names_list.sort()
     for jpg_name in jpg_names_list:
         lang_code = None
         print(jpg_name)
@@ -47,23 +49,30 @@ def get_text_files_from_jpgs(jpg_names_list: list,
                 lang_code = 'deu'
             text = str(pytesseract.image_to_string(img, lang=lang_code))
             if lang_code == 'deu':
-                text = str(pytesseract.image_to_string(img, lang='deu_frak'))
-            text.encode('utf8')
+                text_frak = str(pytesseract.image_to_string(img, lang='deu_frak'))
+            else:
+                text_frak = ''
+            text = text + '\n' + text_frak
+            text = text.encode('utf-8')
+            text = text.decode('utf-8')
             if save_file:
                 if jpg_name[:26] == last_file[:26]:
-                    with open(target_dir_path + '/' + last_file, 'a') as text_file:
+                    with open(target_dir_path + '/' + txt_name, 'a', encoding='utf-8') as text_file:
                         text_file.write(' \n' + text)
                 else:
-                    with open(target_dir_path + '/' + txt_name, 'w') as text_file:
+                    with open(target_dir_path + '/' + txt_name, 'w', encoding='utf-8') as text_file:
                         text_file.write(text)
             last_file = jpg_name
             return text
         except Exception as e:
-            print(e)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print('Error! Code: {c}, Message, {m}, Type, {t}, File, {f}, Line {line}'.format(
+                c=type(e).__name__, m=str(e), t=exc_type, f=fname, line=exc_tb.tb_lineno))
             continue
 
 
 if __name__ == '__main__':
     # main_jpg_names_list = get_jpg_names_list('jpgs/')
-    print(get_text_files_from_jpgs(jpg_names_list=['0000xx_000012_000xx_00001_PIC_P000012000000191479000010000_0000_00000000HP_A.txt'],
+    print(get_text_files_from_jpgs(jpg_names_list=['0000xx_000010_000xx_00001_PIC_P000010000000000000000010000_0000_00000000HP_A.JPG'],
                              source_dir_path='jpgs_sharpened'))
