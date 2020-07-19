@@ -32,7 +32,7 @@ for image_name in os.listdir("../GND/article_entities"):
     with open("journals_published_in.json", mode="r", encoding="Utf-8") as file:
         pubs = json.load(file)
     image_name = image_name.replace(".json", ".JPG")
-    for image_name in pubs:
+    if image_name in pubs:
         if pubs[image_name] != "":
             graph.add((URIRef(pubs[image_name]), RDF.type, DCTERMS.BibliographicResource))
             graph.add((URIRef(pubs[image_name]), DCTERMS.hasPart, URIRef(document_url)))
