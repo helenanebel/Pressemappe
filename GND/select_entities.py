@@ -13,11 +13,11 @@ def filter_stopwords(name, language):
         filter_name = name
     return filter_name
 
-if "image_entities" not in os.listdir():
-    os.mkdir("image_entities")
+if "article_entities" not in os.listdir():
+    os.mkdir("article_entities")
 
-for image_name in os.listdir("image_member"):
-    with open("image_member/" + image_name, "r") as file:
+for image_name in os.listdir("article_member"):
+    with open("article_member/" + image_name, "r") as file:
         image = json.load(file)
 
     for entity in image:
@@ -66,11 +66,11 @@ for image_name in os.listdir("image_member"):
                 for match in delete_match:
                     entity["possible_gnd"].remove(match)
 
-    with open("image_member/../image_entities/" + image_name, "w+") as file:
+    with open("article_member/../article_entities/" + image_name, "w+") as file:
         json.dump(image, file, indent=4)
 
-for image_name in os.listdir("image_entities"):
-    with open("image_entities/" + image_name, "r") as file:
+for image_name in os.listdir("article_entities"):
+    with open("article_entities/" + image_name, "r") as file:
         image = json.load(file)
     for entity in image:
         filtered_name = filter_stopwords(entity["name"], entity["language"])
@@ -103,5 +103,5 @@ for image_name in os.listdir("image_entities"):
             if "gnd" in entity:
                 entity.pop("possible_gnd", None)
 
-    with open("image_entities/" + image_name, "w+") as file:
+    with open("article_entities/" + image_name, "w+") as file:
         json.dump(image, file, indent=4)
