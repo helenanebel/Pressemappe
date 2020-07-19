@@ -4,6 +4,7 @@ from OCR.tesseract_pressemappe import get_text_files_from_jpgs
 import os
 from OCR.cut_articles_from_scans import cut_articles
 from OCR.rotate_files_to_horizontal import determine_rotation_degree_and_rotate
+from OCR.get_jpgs import get_jpgs
 
 jpgs_for_evaluation = [ "0000xx_000010_000xx_00002_PIC_P000010000000000000000020000_0000_00000000HP_A.JPG",
                         "0000xx_000010_000xx_00002_PIC_P000010000000000000000020001_0000_00000000HP_A.JPG",

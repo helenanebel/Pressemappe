@@ -69,7 +69,6 @@ def get_text_files_from_jpgs(jpg_names_list: list,
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print('Error! Code: {c}, Message, {m}, Type, {t}, File, {f}, Line {line}'.format(
                 c=type(e).__name__, m=str(e), t=exc_type, f=fname, line=exc_tb.tb_lineno))
-            continue
 
 
 if __name__ == '__main__':
