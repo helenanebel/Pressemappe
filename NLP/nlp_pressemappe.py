@@ -48,8 +48,8 @@ for filepath in files:
             end_list.append({
                 'name': person,
                 'type': 'PER',
-                'frequency': count,
-                'Language': lang
+                #'frequency': count,#
+                'language': lang
             })
 
         # Entitäten der Locations zählen
@@ -58,16 +58,14 @@ for filepath in files:
             end_list.append({
                 'name': location,
                 'type': 'LOC',
-                'frequency': count,
-                'Language': lang
+                #'frequency': count,
+                'language': lang
             })
 
         # Speicherung der Listen im Dictionary.
         # z.B. final_dict['JPG_basename.txt'] = [{'name': 'Abbas Hilmi', 'type': 'PER', 'frequency': 2}, ...]
         end_dict[base_name.replace('txt', 'JPG')] = end_list
         print('Final result', end_dict)
-        print(type(end_dict))
-
 
 
 # Speicherung Dictionary in JSON Datei zur Weiterverarbeitung
