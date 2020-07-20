@@ -5,7 +5,7 @@ from math import ceil
 from nltk.corpus import stopwords
 
 
-with open("entities.json", mode="r", encoding="utf-8") as file:
+with open("../NLP/entities.json", mode="r", encoding="utf-8") as file:
     image_list = json.load(file)
 
 with open("relations.json", mode="r", encoding="utf-8") as file:
@@ -24,6 +24,7 @@ def build_url(name, type):
     url = "https://lobid.org/gnd/search?q="
 
     for counter, part in enumerate(name.split()):
+        part = part.replace("(", "").replace(")", "")
         url += parse.quote_plus("(preferredName:" + part) + "+OR+"
         url += parse.quote_plus("variantName:" + part + ")")
 
