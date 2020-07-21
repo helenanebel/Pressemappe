@@ -1,6 +1,7 @@
 import json
 import os
 from urllib import request, parse
+from urllib.error import HTTPError, URLError
 from math import ceil
 from nltk.corpus import stopwords
 
@@ -24,7 +25,6 @@ def build_url(name, type):
     url = "https://lobid.org/gnd/search?q="
 
     for counter, part in enumerate(name.split()):
-        part = part.replace("(", "").replace(")", "")
         url += parse.quote_plus("(preferredName:" + part) + "+OR+"
         url += parse.quote_plus("variantName:" + part + ")")
 
@@ -48,14 +48,17 @@ def build_url(name, type):
 
 # nur bis 10.000 Treffer erfassen
 def get_member(url):
-    req = request.Request(url)
-    with request.urlopen(req) as response:
-        json_response = response.read()
+    member = []
+    try:
+        req = request.Request(url)
+        with request.urlopen(req) as response:
+            json_response = response.read()
+    except HTTPError:
+        return member
     json_response = json_response.decode("utf-8")
     json_response = json.loads(json_response)
     count = json_response["totalItems"]
     start = 0
-    member = []
     if count in range(1,10000):
         for c in range(ceil(count / 1000)):
             loop_url = url + "&from=" + str(start)
