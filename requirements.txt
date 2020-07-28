@@ -1,8 +1,10 @@
-bs4~=0.0.1
-beautifulsoup4~=4.9.1
 nltk~=3.5
-numpy~=1.19.0
-rdflib~=5.0.0
 spacy~=2.2.4
 langdetect~=1.0.8
+bs4~=0.0.1
+beautifulsoup4~=4.9.1
+opencv-python~=4.3.0.36
+numpy~=1.19.0
 pytesseract~=0.3.4
+scipy~=1.5.1
+rdflib~=5.0.0
