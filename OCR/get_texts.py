@@ -84,7 +84,7 @@ jpgs_for_evaluation = [ "0000xx_000010_000xx_00002_PIC_P000010000000000000000020
                         "0110xx_011060_000xx_00040_PIC_P011060000000000000000400000_0000_00000000HP_A.JPG"]
 
 
-def get_selected_texts(jpgs_list: list, source_dir_path: str = 'jpgs_cut', target_dir_path: str = 'pressemappe_text_files'):
+def get_selected_texts(jpgs_list: list, source_dir_path: str = 'OCR/jpgs_cut', target_dir_path: str = 'OCR/pressemappe_text_files'):
     last = ''
     jpgs_list.sort()
     for picture in jpgs_list:
