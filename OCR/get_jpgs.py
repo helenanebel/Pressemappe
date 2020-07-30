@@ -83,7 +83,7 @@ def get_jpgs(jpg_url_list: list ,
              path_name: str = 'C://Users/Helena_Nebel/PycharmProjects/Pressemappe'):
     try:
         if 'jpgs' not in os.listdir(path_name + '/OCR'):
-            os.mkdir('jpgs')
+            os.mkdir('OCR/jpgs')
         print(len(jpg_url_list))
         for jpg_url in jpg_url_list:
             jpg_name = jpg_url.replace('http://webopac.hwwa.de/DigiPerson/P/', '')
