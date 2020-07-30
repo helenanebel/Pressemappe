@@ -3,6 +3,9 @@ import json
 from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, DCTERMS
 
+with open("../OCR/journals_published_in.json", mode="r") as file:
+    pubs = json.load(file)
+
 # Liste aller Entitäten
 total = []
 for image_name in os.listdir("../GND/article_entities"):
@@ -27,16 +30,16 @@ for image_name in os.listdir("../GND/article_entities"):
     document_url = "http://webopac.hwwa.de/PresseMappe20Bookmark/PM20bm.cfm?mid=P" + image_name[7:13] + "&dn=" + str(int(image_name[20:25]))
     graph.add((URIRef(document_url), RDF.type, DCTERMS.BibliographicResource))
 
-    # hier übergeordnete Publikation und Beziehung ergänzen
-
-    with open("journals_published_in.json", mode="r", encoding="Utf-8") as file:
-        pubs = json.load(file)
     image_name = image_name.replace(".json", ".JPG")
+
     if image_name in pubs:
         if pubs[image_name] != "":
-            graph.add((URIRef(pubs[image_name]), RDF.type, DCTERMS.BibliographicResource))
-            graph.add((URIRef(pubs[image_name]), DCTERMS.hasPart, URIRef(document_url)))
-            graph.add((URIRef(document_url), DCTERMS.isPartOf, URIRef(pubs[image_name])))
+            publication_url = pubs[image_name]["url"]
+            graph.add((URIRef(publication_url), RDF.type, DCTERMS.BibliographicResource))
+            graph.add((URIRef(publication_url), DCTERMS.title, Literal(pubs[image_name]["title"])))
+
+            graph.add((URIRef(publication_url), DCTERMS.hasPart, URIRef(document_url)))
+            graph.add((URIRef(document_url), DCTERMS.isPartOf, URIRef(publication_url)))
 
     for entity in image:
         if "gnd" in entity:

@@ -9,7 +9,7 @@ nlpde = spacy.load('de_core_news_sm')
 nlpfr = spacy.load('fr_core_news_sm')
 nlpen = spacy.load('en_core_web_sm')
 
-docs ='zp' # Pfad zum Dateien Corpus
+docs ='../ocr/pressemappe_text_Files' # Pfad zum Dateien Corpus
 end_dict = {}  # speichert finalen Output in einem einzigen Dictionary
 def get_filename(path):
     return [i.path for i in os.scandir(path) if i.is_file()]
@@ -64,7 +64,7 @@ for filepath in files:
 
         # Speicherung der Listen im Dictionary.
         # z.B. final_dict['JPG_basename.txt'] = [{'name': 'Abbas Hilmi', 'type': 'PER', 'frequency': 2}, ...]
-        end_dict[base_name.replace('txt', 'JPG')] = end_list
+        end_dict[base_name + ('.JPG')] = end_list
         print('Final result', end_dict)
 
 
