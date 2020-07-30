@@ -88,7 +88,7 @@ def get_jpgs(jpg_url_list: list ,
         for jpg_url in jpg_url_list:
             jpg_name = jpg_url.replace('http://webopac.hwwa.de/DigiPerson/P/', '')
             jpg_name = jpg_name.replace('/', '_')
-            urllib.request.urlretrieve(jpg_url, 'jpgs/' + jpg_name)
+            urllib.request.urlretrieve(jpg_url, 'OCR/jpgs/' + jpg_name)
     except Exception as e:
         print(e)
 
