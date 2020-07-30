@@ -13,13 +13,12 @@ def get_jpg_names_list(source_dir_path: str):
 
 
 def get_text_files_from_jpgs(jpg_names_list: list,
+                             tesseract_dir_path: str,
                              source_dir_path: str = 'jpgs_added',
                              target_dir_path: str = 'test_added',
-                             tesseract_dir_path: str = r'C:\Program Files\Tesseract-OCR\tesseract.exe',
-                             path_name: str = 'C://Users/Helena_Nebel/PycharmProjects/Pressemappe/OCR',
                              save_file: bool = True,
                              img_obj = None, img_obj_given: bool = False):
-    if target_dir_path not in os.listdir(path_name):
+    if target_dir_path not in os.listdir('OCR'):
         os.mkdir(target_dir_path)
     last_file = ''
     jpg_names_list.sort()
@@ -74,4 +73,5 @@ def get_text_files_from_jpgs(jpg_names_list: list,
 if __name__ == '__main__':
     # main_jpg_names_list = get_jpg_names_list('jpgs/')
     print(get_text_files_from_jpgs(jpg_names_list=['0000xx_000010_000xx_00001_PIC_P000010000000000000000010000_0000_00000000HP_A.JPG'],
-                             source_dir_path='jpgs_sharpened'))
+                                   tesseract_dir_path=r'C:\Program Files\Tesseract-OCR\tesseract.exe',
+                                   source_dir_path='jpgs_sharpened'))
