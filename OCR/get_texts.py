@@ -84,7 +84,7 @@ jpgs_for_evaluation = [ "0000xx_000010_000xx_00002_PIC_P000010000000000000000020
                         "0110xx_011060_000xx_00040_PIC_P011060000000000000000400000_0000_00000000HP_A.JPG"]
 
 
-def get_texts(jpgs_list: list, source_dir_path: str = 'jpgs_cut', target_dir_path: str = 'pressemappe_text_files'):
+def get_selected_texts(jpgs_list: list, source_dir_path: str = 'jpgs_cut', target_dir_path: str = 'pressemappe_text_files'):
     last = ''
     jpgs_list.sort()
     for picture in jpgs_list:
@@ -117,9 +117,16 @@ def get_texts(jpgs_list: list, source_dir_path: str = 'jpgs_cut', target_dir_pat
         last = txt_name
 
 
+def get_texts():
+    jpg_list = ['http://webopac.hwwa.de/DigiPerson/P/' + jpg for jpg in jpgs_names_for_evaluation]
+    for jpg in jpg_list:
+        get_jpgs([jpg])
+    get_selected_texts(jpgs_for_evaluation)
+
+
 if __name__ == '__main__':
     jpg_list = ['http://webopac.hwwa.de/DigiPerson/P/' + jpg for jpg in jpgs_names_for_evaluation]
     for jpg in jpg_list:
         print(jpg)
         get_jpgs([jpg])
-    get_texts(jpgs_for_evaluation)
+    get_selected_texts(jpgs_for_evaluation)
