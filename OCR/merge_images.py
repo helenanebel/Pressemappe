@@ -6,8 +6,8 @@ import os
 
 
 def merge_pictures(picture: str, do_save_img: bool = True):
-    img_2 = get_contours(picture, source_dir_path='jpgs_cut')
-    img_1 = cv.imread('jpgs_sharpened/' + picture)
+    img_2 = get_contours(picture, source_dir_path='OCR/jpgs_cut')
+    img_1 = cv.imread('OCR/jpgs_sharpened/' + picture)
     gray_1 = cv.cvtColor(img_1, cv.COLOR_BGR2GRAY)
     if gray_1.shape[1] < img_2.shape[1]:
         new_column = np.zeros((1, gray_1.shape[1]), np.uint8)
@@ -16,7 +16,7 @@ def merge_pictures(picture: str, do_save_img: bool = True):
         # Falls das Konturenbild angepasst wurde, müssen die Shapes wieder angepasst werden.
     dst = cv.bitwise_and(gray_1, img_2)
     if do_save_img:
-        save_img(dst, picture, 'jpgs_added/')
+        save_img(dst, picture, 'OCR/jpgs_added/')
     return dst
 
 
