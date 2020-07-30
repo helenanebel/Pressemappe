@@ -84,7 +84,7 @@ jpgs_for_evaluation = [ "0000xx_000010_000xx_00002_PIC_P000010000000000000000020
                         "0110xx_011060_000xx_00040_PIC_P011060000000000000000400000_0000_00000000HP_A.JPG"]
 
 
-def get_selected_texts(jpgs_list: list, source_dir_path: str = 'OCR/jpgs_cut', target_dir_path: str = 'OCR/pressemappe_text_files'):
+def get_selected_texts(jpgs_list: list, tess_path: str, source_dir_path: str = 'OCR/jpgs_cut', target_dir_path: str = 'OCR/pressemappe_text_files'):
     last = ''
     jpgs_list.sort()
     for picture in jpgs_list:
@@ -99,9 +99,9 @@ def get_selected_texts(jpgs_list: list, source_dir_path: str = 'OCR/jpgs_cut', t
         merged = merge_pictures(picture, do_save_img=False)
         # merged_rotated = determine_rotation_degree_and_rotate(picture, do_save_img=False, do_remove_borders=False,
                                                          # img_obj_given=True, img_obj=merged)
-        text_sharpened = get_text_files_from_jpgs([picture], img_obj=sharpened, save_file=False, img_obj_given=True)
+        text_sharpened = get_text_files_from_jpgs([picture], tesseract_dir_path=tess_path, img_obj=sharpened, save_file=False, img_obj_given=True)
         print('sharpened')
-        text_merged = get_text_files_from_jpgs([picture], img_obj=merged, save_file=False, img_obj_given=True)
+        text_merged = get_text_files_from_jpgs([picture], tesseract_dir_path=tess_path, img_obj=merged, save_file=False, img_obj_given=True)
         print('merged')
         txt_name = picture.replace('.JPG', '')
         text = text_sharpened + '\n' + text_merged
@@ -117,16 +117,17 @@ def get_selected_texts(jpgs_list: list, source_dir_path: str = 'OCR/jpgs_cut', t
         last = txt_name
 
 
-def get_texts():
+def get_texts(tess_path):
     jpg_list = ['http://webopac.hwwa.de/DigiPerson/P/' + jpg for jpg in jpgs_names_for_evaluation]
     for jpg in jpg_list:
         get_jpgs([jpg])
-    get_selected_texts(jpgs_for_evaluation)
+    get_selected_texts(jpgs_for_evaluation, tess_path)
 
 
 if __name__ == '__main__':
     jpg_list = ['http://webopac.hwwa.de/DigiPerson/P/' + jpg for jpg in jpgs_names_for_evaluation]
+    tess_path = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     for jpg in jpg_list:
         print(jpg)
         get_jpgs([jpg])
-    get_selected_texts(jpgs_for_evaluation)
+    get_selected_texts(jpgs_for_evaluation, tess_path)
