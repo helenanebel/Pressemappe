@@ -6,7 +6,7 @@ from OCR.img_methods import color_to_gray, save_img
 
 
 def get_contours(picture, do_save_img: bool = True,
-                 source_dir_path: str = 'jpgs_cut', target_dir_path: str = 'jpgs_contours'):
+                 source_dir_path: str = 'OCR/jpgs_cut', target_dir_path: str = 'OCR/jpgs_contours'):
     img = cv.imread(source_dir_path + '/' + picture)
     gray = color_to_gray(img)
     # sollte man das auch für das zweite Bild machen?
@@ -54,10 +54,10 @@ def get_contours(picture, do_save_img: bool = True,
     opening = cv.dilate(mask, (3, 3), iterations=2)
     erosion = cv.dilate(opening, (3, 3), iterations=2)
     if do_save_img:
-        save_img(erosion, target_dir_path + '/' + picture, 'jpgs_contours/')
+        save_img(erosion, target_dir_path + '/' + picture, 'OCR/jpgs_contours/')
     return erosion
 
 
 if __name__ == '__main__':
-    jpgs_list = os.listdir('jpgs_cut')
+    jpgs_list = os.listdir('OCR/jpgs_cut')
     get_contours(jpgs_list)
