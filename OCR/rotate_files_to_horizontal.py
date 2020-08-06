@@ -6,7 +6,7 @@ from scipy import stats
 
 def determine_rotation_degree_and_rotate(picture, do_save_img: bool = True,
                                          do_remove_borders: bool = True,
-                                         img_obj = None, img_obj_given: bool = False):
+                                         img_obj=None, img_obj_given: bool = False):
     if img_obj_given:
         img = img_obj
     else:
@@ -92,11 +92,12 @@ def determine_rotation_degree_and_rotate(picture, do_save_img: bool = True,
                     for i in range(gray.shape[1]):
                         gray[row, i] = 255
     if do_save_img:
-        save_img(gray, picture, 'jpgs_rotated/') # geht nur mit .JPG am Ende.
+        save_img(gray, picture, 'jpgs_rotated/')  # geht nur mit .JPG am Ende.
     return gray
 
 
 if __name__ == '__main__':
-    determine_rotation_degree_and_rotate(['0000xx_000012_000xx_00008_PIC_P000012000000000000000080001_0000_00000000HP_A.JPG'])
+    determine_rotation_degree_and_rotate(
+        ['0000xx_000012_000xx_00008_PIC_P000012000000000000000080001_0000_00000000HP_A.JPG'])
 
 # evtl. weiterentwickeln, dass Überschriften abgeschnitten werden.
