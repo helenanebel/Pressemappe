@@ -4,13 +4,13 @@ from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, DCTERMS
 
 def make_rdf():
-    with open("../OCR/journals_published_in.json", mode="r") as file:
+    with open("RDF/journals_published_in.json", mode="r") as file:
         pubs = json.load(file)
 
     # Liste aller Entitäten
     total = []
-    for image_name in os.listdir("../GND/article_entities"):
-        with open("../GND/article_entities/" + image_name, "r") as file:
+    for image_name in os.listdir("GND/article_entities"):
+        with open("GND/article_entities/" + image_name, "r") as file:
             image = json.load(file)
         for entity in image:
             if "gnd" in entity:
@@ -23,8 +23,8 @@ def make_rdf():
     graph.bind("gndo", GND)
     graph.bind("dcterms", DCTERMS)
 
-    for image_name in os.listdir("../GND/article_entities"):
-        with open("../GND/article_entities/" + image_name, "r") as file:
+    for image_name in os.listdir("GND/article_entities"):
+        with open("GND/article_entities/" + image_name, "r") as file:
             image = json.load(file)
 
         # Link zu Dokument
