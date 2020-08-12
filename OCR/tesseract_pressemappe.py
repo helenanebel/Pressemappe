@@ -14,12 +14,10 @@ def get_jpg_names_list(source_dir_path: str):
 
 def get_text_files_from_jpgs(jpg_names_list: list,
                              tesseract_dir_path: str,
-                             source_dir_path: str = 'jpgs_added',
-                             target_dir_path: str = 'test_added',
+                             source_dir_path: str = 'OCR/jpgs_added',
+                             target_dir_path: str = 'OCR/test_added',
                              save_file: bool = True,
                              img_obj = None, img_obj_given: bool = False):
-    if target_dir_path not in os.listdir('OCR'):
-        os.mkdir(target_dir_path)
     last_file = ''
     jpg_names_list.sort()
     for jpg_name in jpg_names_list:
@@ -55,6 +53,8 @@ def get_text_files_from_jpgs(jpg_names_list: list,
             text = text.encode('utf-8')
             text = text.decode('utf-8')
             if save_file:
+                if target_dir_path not in os.listdir('OCR'):
+                    os.mkdir(target_dir_path)
                 if jpg_name[:26] == last_file[:26]:
                     with open(target_dir_path + '/' + txt_name, 'a', encoding='utf-8') as text_file:
                         text_file.write(' \n' + text)

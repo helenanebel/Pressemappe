@@ -10,7 +10,7 @@ def determine_rotation_degree_and_rotate(picture, do_save_img: bool = True,
     if img_obj_given:
         img = img_obj
     else:
-        img = cv.imread('jpgs_sharpened/' + picture)
+        img = cv.imread('OCR/jpgs_sharpened/' + picture)
     degree_values = {}
     degree_dicts = {}
     for degree in range(-10, 10, 1):
@@ -92,7 +92,7 @@ def determine_rotation_degree_and_rotate(picture, do_save_img: bool = True,
                     for i in range(gray.shape[1]):
                         gray[row, i] = 255
     if do_save_img:
-        save_img(gray, picture, 'jpgs_rotated/')  # geht nur mit .JPG am Ende.
+        save_img(gray, picture, 'OCR/jpgs_rotated/')  # geht nur mit .JPG am Ende.
     return gray
 
 
