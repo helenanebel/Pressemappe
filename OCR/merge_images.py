@@ -5,10 +5,11 @@ import numpy as np
 import os
 
 
-def merge_pictures(picture: str, do_save_img: bool = True):
+def merge_pictures(picture: str, do_save_img: bool = True, gray_1=None, img_obj_given=False):
     img_2 = get_contours(picture, source_dir_path='OCR/jpgs_cut')
-    img_1 = cv.imread('OCR/jpgs_sharpened/' + picture)
-    gray_1 = cv.cvtColor(img_1, cv.COLOR_BGR2GRAY)
+    if not img_obj_given:
+        img_1 = cv.imread('OCR/jpgs_sharpened/' + picture)
+        gray_1 = cv.cvtColor(img_1, cv.COLOR_BGR2GRAY)
     if gray_1.shape[1] < img_2.shape[1]:
         new_column = np.zeros((1, gray_1.shape[1]), np.uint8)
         new_column.fill(255)

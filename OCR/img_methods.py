@@ -14,6 +14,6 @@ def color_to_gray(img):
 
 
 def rotate_by_degree(img, angle):
-    return cv.warpAffine(img, cv.getRotationMatrix2D((img.shape[1]/2, img.shape[0]/2), angle, 1.0), (img.shape[1], img.shape[0]), borderValue=255)
+    return cv.warpAffine(img, cv.getRotationMatrix2D((img.shape[1]/2, img.shape[0]/2), angle, 1.0), (img.shape[1], img.shape[0]), flags=cv.INTER_CUBIC, borderValue=255)
 
 

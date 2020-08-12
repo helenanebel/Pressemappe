@@ -79,16 +79,15 @@ def get_jpg_urls(jpg_amount: int = 2000):
     return jpg_urls
 
 
-def get_jpgs(jpg_url_list: list ,
+def get_jpg(jpg_url: str ,
              path_name: str = 'C://Users/Helena_Nebel/PycharmProjects/Pressemappe'):
     try:
         if 'jpgs' not in os.listdir(path_name + '/OCR'):
             os.mkdir('OCR/jpgs')
-        print(len(jpg_url_list))
-        for jpg_url in jpg_url_list:
-            jpg_name = jpg_url.replace('http://webopac.hwwa.de/DigiPerson/P/', '')
-            jpg_name = jpg_name.replace('/', '_')
-            urllib.request.urlretrieve(jpg_url, 'OCR/jpgs/' + jpg_name)
+        print(jpg_url)
+        jpg_name = jpg_url.replace('http://webopac.hwwa.de/DigiPerson/P/', '')
+        jpg_name = jpg_name.replace('/', '_')
+        urllib.request.urlretrieve(jpg_url, 'jpgs/' + jpg_name)
     except Exception as e:
         print(e)
 
@@ -97,4 +96,4 @@ if __name__ == '__main__':
     jpg_list = ['http://webopac.hwwa.de/DigiPerson/P/' + jpg for jpg in jpgs_for_evaluation]
     for jpg in jpg_list:
         print(jpg)
-        get_jpgs([jpg])
+        get_jpg(jpg)
