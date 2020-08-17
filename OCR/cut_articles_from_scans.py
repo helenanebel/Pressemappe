@@ -42,7 +42,7 @@ def cut_articles(jpgs_list: list):
         if picture_nr > 1000:
             break
         picture_nr += 1
-        img = cv.imread('jpgs/' + picture)
+        img = cv.imread('OCR/jpgs/' + picture)
         img = cv.copyMakeBorder(img, 100, 100, 100, 100, cv.BORDER_CONSTANT, value=(255, 255, 255))
         gray = color_to_gray(img)
 

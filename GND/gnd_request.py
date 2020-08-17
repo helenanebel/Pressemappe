@@ -6,16 +6,16 @@ from math import ceil
 from nltk.corpus import stopwords
 
 def get_gnd():
-    with open("../NLP/entities.json", mode="r", encoding="utf-8") as file:
+    with open("GND/entities.json", mode="r", encoding="utf-8") as file:
         image_list = json.load(file)
 
-    with open("relations.json", mode="r", encoding="utf-8") as file:
+    with open("GND/relations.json", mode="r", encoding="utf-8") as file:
         relations = json.load(file)
 
-    with open("geo_codes.json", mode="r", encoding="utf-8") as file:
+    with open("GND/geo_codes.json", mode="r", encoding="utf-8") as file:
         geo_codes = json.load(file)
 
-    with open("stopword_language.json", mode="r", encoding="utf-8") as file:
+    with open("GND/stopword_language.json", mode="r", encoding="utf-8") as file:
         language_codes = json.load(file)
 
     if "article_member" not in os.listdir():
@@ -98,7 +98,9 @@ def get_gnd():
 
 
     for image in image_list:
+        print(image)
         for entity in image_list[image]:
+            print(entity)
             url = build_url(entity["name"], entity["type"])
 
             member_list = get_member(url)
@@ -131,6 +133,7 @@ def get_gnd():
 
         with open("article_member/" + image.replace(".JPG", ".json"), "w+") as file:
             json.dump(image_list[image], file, indent=4)
+
 
 if __name__ == '__main__':
     get_gnd()

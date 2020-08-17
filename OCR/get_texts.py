@@ -104,7 +104,6 @@ class Article(object):
    # Funktion zum Scrapen der Ratings
    def get_text(self):
        try:
-           print(self.target_dir_path)
            picture = self.image
            start = datetime.now()
            if picture not in os.listdir(self.source_dir_path):
@@ -138,13 +137,12 @@ class Article(object):
            time_difference = (datetime.now() - start).total_seconds()
            print(time_difference)
            picture = picture[:57] + '0'
-           print(picture)
            if picture in os.listdir(self.target_dir_path):
                with open(self.target_dir_path + '/' + picture, 'a', encoding='utf-8') as text_file:
                    print(picture)
                    text_file.write(text)
            else:
-               with open(self.target_dir_path + '/' + txt_name, 'w', encoding='utf-8') as text_file:
+               with open(self.target_dir_path + '/' + picture, 'w', encoding='utf-8') as text_file:
                    print(picture)
                    text_file.write(text)
            self.text = text
@@ -160,11 +158,11 @@ class Article(object):
 
 def get_texts(jpg_list, tesseract_path, source_dir_path, target_dir_path):
    print(jpg_list, tesseract_path, source_dir_path, target_dir_path)
-   for index in range(0, len(jpg_list)-1, 4):
-       print(index)
+   print(len(jpg_list))
+   for index in range(0, len(jpg_list)-1, 5):
        if index > (len(jpg_list) - 5):
            article_actors = \
-               [Article.remote(jpg_list[index + i], tesseract_path, source_dir_path, target_dir_path) for i in range(5)]
+               [Article.remote(jpg_list[index:], tesseract_path, source_dir_path, target_dir_path) for i in range(5)]
            [a.get_text.remote() for a in article_actors]
            texts = [a.read.remote() for a in article_actors]
            ray.get(texts)

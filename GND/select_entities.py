@@ -3,7 +3,7 @@ import os
 from nltk.corpus import stopwords
 
 def select_gnd():
-    with open("stopword_language.json", mode="r", encoding="utf-8") as file:
+    with open("GND/stopword_language.json", mode="r", encoding="utf-8") as file:
         language_codes = json.load(file)
 
     def filter_stopwords(name, language):
