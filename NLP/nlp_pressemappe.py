@@ -10,12 +10,11 @@ def get_entities():
     nlpit = spacy.load('it_core_news_sm')
     nlpde = spacy.load('de_core_news_sm')
     nlpfr = spacy.load('fr_core_news_sm')
-    nlpen = spacy.load('en_core_web_sm')
+    #nlpen = spacy.load('en_core_web_sm')
 
-    docs ='OCR/pressemappe_text_files' # Pfad zum Dateien Corpus
+    docs ='OCR/pressemappe_text_Files' # Pfad zum Dateien Corpus
     end_dict = {}  # speichert finalen Output in einem einzigen Dictionary
     def get_filename(path):
-        print()
         return [i.path for i in os.scandir(path) if i.is_file()]
     files=get_filename(docs)
 
@@ -52,7 +51,7 @@ def get_entities():
                 end_list.append({
                     'name': person,
                     'type': 'PER',
-                    #'frequency': count,#
+                    #'frequency': count,
                     'language': lang
                 })
 
@@ -73,7 +72,7 @@ def get_entities():
 
 
     # Speicherung Dictionary in JSON Datei zur Weiterverarbeitung
-    with open('GND/entities.json', mode="r+") as file:
+    with open('NLP/entities.json', mode="w+") as file:
         file.seek(0, 2)
         position = file.tell()
         file.seek(position)

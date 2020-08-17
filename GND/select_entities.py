@@ -14,11 +14,11 @@ def select_gnd():
             filter_name = name
         return filter_name
 
-    if "article_entities" not in os.listdir():
-        os.mkdir("article_entities")
+    if "article_entities" not in os.listdir("GND/"):
+        os.mkdir("GND/article_entities")
 
-    for image_name in os.listdir("article_member"):
-        with open("article_member/" + image_name, "r") as file:
+    for image_name in os.listdir("GND/article_member"):
+        with open("GND/article_member/" + image_name, "r") as file:
             image = json.load(file)
 
         for entity in image:
@@ -67,11 +67,11 @@ def select_gnd():
                     for match in delete_match:
                         entity["possible_gnd"].remove(match)
 
-        with open("article_member/../article_entities/" + image_name, "w+") as file:
+        with open("GND/article_member/../article_entities/" + image_name, "w+") as file:
             json.dump(image, file, indent=4)
 
-    for image_name in os.listdir("article_entities"):
-        with open("article_entities/" + image_name, "r") as file:
+    for image_name in os.listdir("GND/article_entities"):
+        with open("GND/article_entities/" + image_name, "r") as file:
             image = json.load(file)
         for entity in image:
             filtered_name = filter_stopwords(entity["name"], entity["language"])
@@ -104,7 +104,7 @@ def select_gnd():
                 if "gnd" in entity:
                     entity.pop("possible_gnd", None)
 
-        with open("article_entities/" + image_name, "w+") as file:
+        with open("GND/article_entities/" + image_name, "w+") as file:
             json.dump(image, file, indent=4)
 
 if __name__ == '__main__':

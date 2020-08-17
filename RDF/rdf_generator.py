@@ -9,8 +9,8 @@ def make_rdf():
 
     # Liste aller Entitäten
     total = []
-    for image_name in os.listdir("article_entities"):
-        with open("article_entities/" + image_name, "r") as file:
+    for image_name in os.listdir("GND/article_entities"):
+        with open("GND/article_entities/" + image_name, "r") as file:
             image = json.load(file)
         for entity in image:
             if "gnd" in entity:
@@ -23,8 +23,8 @@ def make_rdf():
     graph.bind("gndo", GND)
     graph.bind("dcterms", DCTERMS)
 
-    for image_name in os.listdir("article_entities"):
-        with open("article_entities/" + image_name, "r") as file:
+    for image_name in os.listdir("GND/article_entities"):
+        with open("GND/article_entities/" + image_name, "r") as file:
             image = json.load(file)
 
         # Link zu Dokument

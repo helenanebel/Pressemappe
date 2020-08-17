@@ -6,7 +6,7 @@ from math import ceil
 from nltk.corpus import stopwords
 
 def get_gnd():
-    with open("GND/entities.json", mode="r", encoding="utf-8") as file:
+    with open("NLP/entities.json", mode="r", encoding="utf-8") as file:
         image_list = json.load(file)
 
     with open("GND/relations.json", mode="r", encoding="utf-8") as file:
@@ -18,8 +18,8 @@ def get_gnd():
     with open("GND/stopword_language.json", mode="r", encoding="utf-8") as file:
         language_codes = json.load(file)
 
-    if "article_member" not in os.listdir():
-        os.mkdir("article_member")
+    if "article_member" not in os.listdir("GND/"):
+        os.mkdir("GND/article_member")
 
     def build_url(name, type):
         url = "https://lobid.org/gnd/search?q="
@@ -98,9 +98,7 @@ def get_gnd():
 
 
     for image in image_list:
-        print(image)
         for entity in image_list[image]:
-            print(entity)
             url = build_url(entity["name"], entity["type"])
 
             member_list = get_member(url)
@@ -131,9 +129,8 @@ def get_gnd():
             member_list = get_data(member_list)
             entity["possible_gnd"] = member_list
 
-        with open("article_member/" + image.replace(".JPG", ".json"), "w+") as file:
+        with open("GND/article_member/" + image.replace(".JPG", ".json"), "w+") as file:
             json.dump(image_list[image], file, indent=4)
-
 
 if __name__ == '__main__':
     get_gnd()
