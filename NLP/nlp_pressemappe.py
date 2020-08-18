@@ -10,7 +10,7 @@ def get_entities():
     nlpit = spacy.load('it_core_news_sm')
     nlpde = spacy.load('de_core_news_sm')
     nlpfr = spacy.load('fr_core_news_sm')
-    #nlpen = spacy.load('en_core_web_sm')
+    nlpen = spacy.load('en_core_web_sm')
 
     docs ='OCR/pressemappe_text_Files' # Pfad zum Dateien Corpus
     end_dict = {}  # speichert finalen Output in einem einzigen Dictionary
@@ -31,7 +31,7 @@ def get_entities():
             elif lang == 'it':
                 doc = nlpit(article_text)
             elif lang == 'en':
-                doc = nlp(article_text)
+                doc = nlpen(article_text)
             elif lang == 'de':
                 doc = nlpde(article_text)
             else:
@@ -43,6 +43,13 @@ def get_entities():
                     plist.append(str(ent))
                  elif ent.label_ == "LOC":
                     llist.append(str(ent))
+            if (len(plist) == 0) and (len(llist) == 0):
+                doc = nlp(article_text)
+                for ent in doc.ents:
+                    if ent.label_ == "PER":
+                        plist.append(str(ent))
+                    elif ent.label_ == "LOC":
+                        llist.append(str(ent))
             end_list = []
 
             # Entitäten zählen (PER)
