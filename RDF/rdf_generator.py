@@ -64,5 +64,6 @@ def make_rdf():
     graph.serialize(format="xml", destination="entities.rdf", encoding="utf-8")
     graph.serialize(format="turtle", destination="entities.ttl", encoding="utf-8")
 
+
 if __name__ == '__main__':
     make_rdf()
